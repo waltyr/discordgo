@@ -1137,6 +1137,7 @@ const (
 // Identify is sent during initial handshake with the discord gateway.
 // https://discord.com/developers/docs/topics/gateway#identify
 type Identify struct {
+	Capabilities       int                 `json:"capabilities"`
 	Token              string              `json:"token"`
 	Properties         IdentifyProperties  `json:"properties"`
 	Compress           bool                `json:"compress"`
@@ -1144,17 +1145,25 @@ type Identify struct {
 	Shard              *[2]int             `json:"shard,omitempty"`
 	Presence           GatewayStatusUpdate `json:"presence,omitempty"`
 	GuildSubscriptions bool                `json:"guild_subscriptions"`
-	Intents            Intent              `json:"intents"`
+	Intents            Intent              `json:"-"` // `json:"intents"`
 }
 
 // IdentifyProperties contains the "properties" portion of an Identify packet
 // https://discord.com/developers/docs/topics/gateway#identify-identify-connection-properties
 type IdentifyProperties struct {
-	OS              string `json:"$os"`
-	Browser         string `json:"$browser"`
-	Device          string `json:"$device"`
-	Referer         string `json:"$referer"`
-	ReferringDomain string `json:"$referring_domain"`
+	OS                     string  `json:"os"`
+	OSVersion              string  `json:"os_version"`
+	Device                 string  `json:"device"`
+	Browser                string  `json:"browser"`
+	BrowserUserAgent       string  `json:"browser_user_agent"`
+	BrowserVersion         string  `json:"browser_version"`
+	Referrer               string  `json:"referrer"`
+	ReferrerCurrent        string  `json:"referrer_current"`
+	ReferringDomain        string  `json:"referring_domain"`
+	ReferringDomainCurrent string  `json:"referring_domain_current"`
+	ClientBuildNumber      string  `json:"client_build_number"`
+	ReleaseChannel         string  `json:"release_channel"`
+	ClientEventSource      *string `json:"client_event_source"`
 }
 
 // Constants for the different bit offsets of text channel permissions
