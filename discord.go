@@ -17,7 +17,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"runtime"
 	"time"
 )
 
@@ -69,11 +68,20 @@ func New(args ...interface{}) (s *Session, err error) {
 
 	// Initilize the Identify Package with defaults
 	// These can be modified prior to calling Open()
+	s.Identify.Capabilities = droidCapabilities
 	s.Identify.Compress = true
 	s.Identify.LargeThreshold = 250
 	s.Identify.GuildSubscriptions = true
-	s.Identify.Properties.OS = runtime.GOOS
-	s.Identify.Properties.Browser = "DiscordGo v" + VERSION
+	s.Identify.Presence.Status = droidStatus
+	s.Identify.Properties.OS = droidOS
+	s.Identify.Properties.OSVersion = droidOSVersion
+	s.Identify.Properties.Browser = droidBrowser
+	s.Identify.Properties.BrowserVersion = droidBrowserVersion
+	s.Identify.Properties.BrowserUserAgent = droidBrowserUserAgent
+	s.Identify.Properties.Referrer = droidReferrer
+	s.Identify.Properties.ReferringDomain = droidReferringDomain
+	s.Identify.Properties.ClientBuildNumber = droidClientBuildNumber
+	s.Identify.Properties.ReleaseChannel = droidReleaseChannel
 	s.Identify.Intents = MakeIntent(IntentsAllWithoutPrivileged)
 
 	// If no arguments are passed return the empty Session interface.
