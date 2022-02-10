@@ -239,7 +239,7 @@ type MessageAttachment struct {
 	Size        int    `json:"size"`
 	ContentType string `json:"content_type"`
 	Description string `json:"description"`
-	Ephemeral   bool   `json:ephemeral"`
+	Ephemeral   bool   `json:"ephemeral"`
 }
 
 // MessageEmbedFooter is a part of a MessageEmbed struct.
