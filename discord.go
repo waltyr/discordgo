@@ -76,8 +76,8 @@ func New(args ...interface{}) (s *Session, err error) {
 	s.Identify.Properties.OS = droidOS
 	s.Identify.Properties.OSVersion = droidOSVersion
 	s.Identify.Properties.Browser = droidBrowser
-	s.Identify.Properties.BrowserVersion = droidBrowserVersion
-	s.Identify.Properties.BrowserUserAgent = droidBrowserUserAgent
+	s.Identify.Properties.BrowserVersion = DroidBrowserVersion
+	s.Identify.Properties.BrowserUserAgent = DroidBrowserUserAgent
 	s.Identify.Properties.Referrer = droidReferrer
 	s.Identify.Properties.ReferringDomain = droidReferringDomain
 	s.Identify.Properties.ClientBuildNumber = droidClientBuildNumber

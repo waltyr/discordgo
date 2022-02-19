@@ -5,8 +5,6 @@ const (
 	droidOS                = "Windows"
 	droidOSVersion         = "10"
 	droidBrowser           = "Chrome"
-	droidBrowserVersion    = "92.0.4515.159"
-	droidBrowserUserAgent  = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/" + droidBrowserVersion + " Safari/537.36"
 	droidReferrer          = "https://discord.com/channels/@me"
 	droidReferringDomain   = "discord.com"
 	droidClientBuildNumber = "83364"
@@ -14,9 +12,14 @@ const (
 	droidStatus            = "online"
 )
 
+const (
+	DroidBrowserVersion   = "92.0.4515.159"
+	DroidBrowserUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/" + DroidBrowserVersion + " Safari/537.36"
+)
+
 var (
 	droidWSHeaders = map[string]string{
-		"User-Agent":    droidBrowserUserAgent,
+		"User-Agent":    DroidBrowserUserAgent,
 		"Origin":        "https://discord.com",
 		"Pragma":        "no-cache",
 		"Cache-Control": "no-cache",
