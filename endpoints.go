@@ -210,4 +210,37 @@ var (
 	EndpointOauth2Application       = EndpointOAuth2Application
 	EndpointOauth2ApplicationsBot   = EndpointOAuth2ApplicationsBot
 	EndpointOauth2ApplicationAssets = EndpointOAuth2ApplicationAssets
+
+	// Non-bot endpoints
+	EndpointUserSettings         = func(uID string) string { return EndpointUsers + uID + "/settings" }
+	EndpointUserGuildSettings    = func(uID, gID string) string { return EndpointUsers + uID + "/guilds/" + gID + "/settings" }
+	EndpointUserDevices          = func(uID string) string { return EndpointUsers + uID + "/devices" }
+	EndpointUserNotes            = func(uID string) string { return EndpointUsers + "@me/notes/" + uID }
+	EndpointGuildIntegrationSync = func(gID, iID string) string { return EndpointGuilds + gID + "/integrations/" + iID + "/sync" }
+	EndpointChannelMessageAck    = func(cID, mID string) string { return EndpointChannels + cID + "/messages/" + mID + "/ack" }
+
+	EndpointRelationships       = func() string { return EndpointUsers + "@me" + "/relationships" }
+	EndpointRelationship        = func(uID string) string { return EndpointRelationships() + "/" + uID }
+	EndpointRelationshipsMutual = func(uID string) string { return EndpointUsers + uID + "/relationships" }
+
+	EndpointIntegrationsJoin = func(iID string) string { return EndpointAPI + "integrations/" + iID + "/join" }
+
+	EndpointAuth           = EndpointAPI + "auth/"
+	EndpointLogin          = EndpointAuth + "login"
+	EndpointLogout         = EndpointAuth + "logout"
+	EndpointVerify         = EndpointAuth + "verify"
+	EndpointVerifyResend   = EndpointAuth + "verify/resend"
+	EndpointForgotPassword = EndpointAuth + "forgot"
+	EndpointResetPassword  = EndpointAuth + "reset"
+	EndpointRegister       = EndpointAuth + "register"
+
+	EndpointVoiceIce = EndpointVoice + "ice"
+
+	EndpointTutorial           = EndpointAPI + "tutorial/"
+	EndpointTutorialIndicators = EndpointTutorial + "indicators"
+
+	EndpointTrack        = EndpointAPI + "track"
+	EndpointSso          = EndpointAPI + "sso"
+	EndpointReport       = EndpointAPI + "report"
+	EndpointIntegrations = EndpointAPI + "integrations"
 )
