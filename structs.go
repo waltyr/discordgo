@@ -837,6 +837,12 @@ func (t *TooManyRequests) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+type ReadStateList struct {
+	Version int          `json:"version"`
+	Partial bool         `json:"partial"`
+	Entries []*ReadState `json:"entries"`
+}
+
 // A ReadState stores data on the read state of channels.
 type ReadState struct {
 	MentionCount  int    `json:"mention_count"`
@@ -1026,6 +1032,12 @@ type UserGuildSettingsChannelOverride struct {
 	Muted                bool   `json:"muted"`
 	MessageNotifications int    `json:"message_notifications"`
 	ChannelID            string `json:"channel_id"`
+}
+
+type UserGuildSettingsList struct {
+	Version int                  `json:"version"`
+	Partial bool                 `json:"partial"`
+	Entries []*UserGuildSettings `json:"entries"`
 }
 
 // A UserGuildSettings stores data for a users guild settings.

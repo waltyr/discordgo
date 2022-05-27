@@ -36,19 +36,19 @@ type Event struct {
 
 // A Ready stores all data for the websocket READY event.
 type Ready struct {
-	Version         int          `json:"v"`
-	SessionID       string       `json:"session_id"`
-	User            *User        `json:"user"`
-	ReadState       []*ReadState `json:"read_state"`
-	PrivateChannels []*Channel   `json:"private_channels"`
-	Guilds          []*Guild     `json:"guilds"`
+	Version         int            `json:"v"`
+	SessionID       string         `json:"session_id"`
+	User            *User          `json:"user"`
+	ReadState       *ReadStateList `json:"read_state"`
+	PrivateChannels []*Channel     `json:"private_channels"`
+	Guilds          []*Guild       `json:"guilds"`
 
 	// Undocumented fields
-	Settings          *Settings            `json:"user_settings"`
-	UserGuildSettings []*UserGuildSettings `json:"user_guild_settings"`
-	Relationships     []*Relationship      `json:"relationships"`
-	Presences         []*Presence          `json:"presences"`
-	Notes             map[string]string    `json:"notes"`
+	Settings          *Settings              `json:"user_settings"`
+	UserGuildSettings *UserGuildSettingsList `json:"user_guild_settings"`
+	Relationships     []*Relationship        `json:"relationships"`
+	Presences         []*Presence            `json:"presences"`
+	Notes             map[string]string      `json:"notes"`
 }
 
 // ChannelCreate is the data for a ChannelCreate event.
