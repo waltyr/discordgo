@@ -1,19 +1,19 @@
 package discordgo
 
 const (
-	droidCapabilities      = 125
+	droidCapabilities      = 509
 	droidOS                = "Windows"
 	droidOSVersion         = "10"
 	droidBrowser           = "Chrome"
 	droidReferrer          = "https://discord.com/channels/@me"
 	droidReferringDomain   = "discord.com"
-	droidClientBuildNumber = "83364"
+	droidClientBuildNumber = "130089"
 	droidReleaseChannel    = "stable"
 	droidStatus            = "online"
 )
 
 const (
-	DroidBrowserVersion   = "92.0.4515.159"
+	DroidBrowserVersion   = "102.0.5005.61"
 	DroidBrowserUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/" + DroidBrowserVersion + " Safari/537.36"
 )
 

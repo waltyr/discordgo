@@ -1752,7 +1752,8 @@ const (
 // Identify is sent during initial handshake with the discord gateway.
 // https://discord.com/developers/docs/topics/gateway#identify
 type Identify struct {
-	Capabilities int `json:"capabilities"`
+	Capabilities int         `json:"capabilities"`
+	ClientState  ClientState `json:"client_state"`
 
 	Token          string              `json:"token"`
 	Properties     IdentifyProperties  `json:"properties"`
@@ -1761,6 +1762,14 @@ type Identify struct {
 	Shard          *[2]int             `json:"shard,omitempty"`
 	Presence       GatewayStatusUpdate `json:"presence,omitempty"`
 	Intents        Intent              `json:"-"` // `json:"intents"`
+}
+
+type ClientState struct {
+	GuildHashes              struct{} `json:"guild_hashes"`
+	HighestLastMessageID     string   `json:"highest_last_message_id"`
+	ReadStateVersion         int      `json:"read_state_version"`
+	UserGuildSettingsVersion int      `json:"user_guild_settings_version"`
+	UserSettingsVersion      int      `json:"user_settings_version"`
 }
 
 // IdentifyProperties contains the "properties" portion of an Identify packet

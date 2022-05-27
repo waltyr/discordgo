@@ -46,22 +46,29 @@ func New(token string) (s *Session, err error) {
 
 	// Initilize the Identify Package with defaults
 	// These can be modified prior to calling Open()
-	s.Identify.Capabilities = droidCapabilities
 	s.Identify.Compress = true
 	s.Identify.LargeThreshold = 250
+	s.Identify.Intents = IntentsAllWithoutPrivileged
+	s.Identify.Token = token
+	s.Token = token
+
 	s.Identify.Presence.Status = droidStatus
 	s.Identify.Properties.OS = droidOS
 	s.Identify.Properties.OSVersion = droidOSVersion
 	s.Identify.Properties.Browser = droidBrowser
 	s.Identify.Properties.BrowserVersion = DroidBrowserVersion
 	s.Identify.Properties.BrowserUserAgent = DroidBrowserUserAgent
-	s.Identify.Properties.Referrer = droidReferrer
-	s.Identify.Properties.ReferringDomain = droidReferringDomain
+	//s.Identify.Properties.Referrer = droidReferrer
+	//s.Identify.Properties.ReferringDomain = droidReferringDomain
 	s.Identify.Properties.ClientBuildNumber = droidClientBuildNumber
 	s.Identify.Properties.ReleaseChannel = droidReleaseChannel
-	s.Identify.Intents = IntentsAllWithoutPrivileged
-	s.Identify.Token = token
-	s.Token = token
+	s.Identify.Capabilities = droidCapabilities
+	s.Identify.ClientState.HighestLastMessageID = "0"
+	s.Identify.ClientState.ReadStateVersion = 0
+	s.Identify.ClientState.UserGuildSettingsVersion = -1
+	s.Identify.ClientState.UserSettingsVersion = -1
+
+	s.UserAgent = s.Identify.Properties.BrowserUserAgent
 
 	return
 }
