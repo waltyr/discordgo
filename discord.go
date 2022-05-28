@@ -15,6 +15,8 @@ package discordgo
 
 import (
 	"net/http"
+	"runtime"
+	"strings"
 	"time"
 )
 
@@ -48,28 +50,41 @@ func New(token string) (s *Session, err error) {
 	// These can be modified prior to calling Open()
 	s.Identify.Compress = true
 	s.Identify.LargeThreshold = 250
+	s.Identify.Properties = &IdentifyProperties{
+		OS:      runtime.GOOS,
+		Browser: "DiscordGo v" + VERSION,
+	}
 	s.Identify.Intents = IntentsAllWithoutPrivileged
 	s.Identify.Token = token
 	s.Token = token
 
-	s.Identify.Presence.Status = droidStatus
-	s.Identify.Properties.OS = droidOS
-	s.Identify.Properties.OSVersion = droidOSVersion
-	s.Identify.Properties.Browser = droidBrowser
-	s.Identify.Properties.BrowserVersion = DroidBrowserVersion
-	s.Identify.Properties.BrowserUserAgent = DroidBrowserUserAgent
-	//s.Identify.Properties.Referrer = droidReferrer
-	//s.Identify.Properties.ReferringDomain = droidReferringDomain
-	s.Identify.Properties.ClientBuildNumber = droidClientBuildNumber
-	s.Identify.Properties.ReleaseChannel = droidReleaseChannel
-	s.Identify.Properties.SystemLocale = droidSystemLocale
-	s.Identify.Capabilities = droidCapabilities
-	s.Identify.ClientState.HighestLastMessageID = "0"
-	s.Identify.ClientState.ReadStateVersion = 0
-	s.Identify.ClientState.UserGuildSettingsVersion = -1
-	s.Identify.ClientState.UserSettingsVersion = -1
+	if !strings.HasPrefix(token, "Bot ") {
+		s.Identify.Presence.Status = droidStatus
+		s.Identify.Properties = &UserIdentifyProperties{
+			OS:               droidOS,
+			OSVersion:        droidOSVersion,
+			Browser:          droidBrowser,
+			BrowserVersion:   DroidBrowserVersion,
+			BrowserUserAgent: DroidBrowserUserAgent,
+			//Referrer: droidReferrer,
+			//ReferringDomain: droidReferringDomain,
+			ClientBuildNumber: droidClientBuildNumber,
+			ReleaseChannel:    droidReleaseChannel,
+			SystemLocale:      droidSystemLocale,
+		}
+		s.Identify.Capabilities = droidCapabilities
+		s.Identify.ClientState = &ClientState{
+			HighestLastMessageID:     "0",
+			ReadStateVersion:         0,
+			UserGuildSettingsVersion: -1,
+			UserSettingsVersion:      -1,
+		}
+		s.Identify.Intents = 0
 
-	s.UserAgent = s.Identify.Properties.BrowserUserAgent
+		s.UserAgent = DroidBrowserUserAgent
+
+		s.IsUser = true
+	}
 
 	return
 }

@@ -129,6 +129,8 @@ type Session struct {
 
 	// used to make sure gateway websocket writes do not happen concurrently
 	wsMutex sync.Mutex
+
+	IsUser bool
 }
 
 // Application stores values for a Discord Application
@@ -1752,16 +1754,43 @@ const (
 // Identify is sent during initial handshake with the discord gateway.
 // https://discord.com/developers/docs/topics/gateway#identify
 type Identify struct {
-	Capabilities int         `json:"capabilities"`
-	ClientState  ClientState `json:"client_state"`
+	Capabilities int          `json:"capabilities,omitempty"`
+	ClientState  *ClientState `json:"client_state,omitempty"`
 
 	Token          string              `json:"token"`
-	Properties     IdentifyProperties  `json:"properties"`
+	Properties     interface{}         `json:"properties"`
 	Compress       bool                `json:"compress"`
 	LargeThreshold int                 `json:"large_threshold"`
 	Shard          *[2]int             `json:"shard,omitempty"`
 	Presence       GatewayStatusUpdate `json:"presence,omitempty"`
-	Intents        Intent              `json:"-"` // `json:"intents"`
+	Intents        Intent              `json:"intents,omitempty"`
+}
+
+// IdentifyProperties contains the "properties" portion of an Identify packet
+// https://discord.com/developers/docs/topics/gateway#identify-identify-connection-properties
+type IdentifyProperties struct {
+	OS              string `json:"$os"`
+	Browser         string `json:"$browser"`
+	Device          string `json:"$device"`
+	Referer         string `json:"$referer"`
+	ReferringDomain string `json:"$referring_domain"`
+}
+
+type UserIdentifyProperties struct {
+	OS                     string  `json:"os"`
+	OSVersion              string  `json:"os_version"`
+	Device                 string  `json:"device"`
+	Browser                string  `json:"browser"`
+	BrowserUserAgent       string  `json:"browser_user_agent"`
+	BrowserVersion         string  `json:"browser_version"`
+	Referrer               string  `json:"referrer"`
+	ReferringDomain        string  `json:"referring_domain"`
+	ReferrerCurrent        string  `json:"referrer_current"`
+	ReferringDomainCurrent string  `json:"referring_domain_current"`
+	ClientBuildNumber      string  `json:"client_build_number"`
+	ReleaseChannel         string  `json:"release_channel"`
+	ClientEventSource      *string `json:"client_event_source"`
+	SystemLocale           string  `json:"system_locale"`
 }
 
 type ClientState struct {
@@ -1770,25 +1799,6 @@ type ClientState struct {
 	ReadStateVersion         int      `json:"read_state_version"`
 	UserGuildSettingsVersion int      `json:"user_guild_settings_version"`
 	UserSettingsVersion      int      `json:"user_settings_version"`
-}
-
-// IdentifyProperties contains the "properties" portion of an Identify packet
-// https://discord.com/developers/docs/topics/gateway#identify-identify-connection-properties
-type IdentifyProperties struct {
-	OS                     string  `json:"os"`
-	OSVersion              string  `json:"os_version"`
-	Device                 string  `json:"device"`
-	Browser                string  `json:"browser"`
-	BrowserUserAgent       string  `json:"browser_user_agent"`
-	BrowserVersion         string  `json:"browser_version"`
-	Referrer               string  `json:"referrer"`
-	ReferrerCurrent        string  `json:"referrer_current"`
-	ReferringDomain        string  `json:"referring_domain"`
-	ReferringDomainCurrent string  `json:"referring_domain_current"`
-	ClientBuildNumber      string  `json:"client_build_number"`
-	ReleaseChannel         string  `json:"release_channel"`
-	ClientEventSource      *string `json:"client_event_source"`
-	SystemLocale           string  `json:"system_locale"`
 }
 
 // StageInstance holds information about a live stage.
