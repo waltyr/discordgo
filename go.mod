@@ -1,4 +1,4 @@
-module gitlab.com/beeper/discordgo
+module github.com/bwmarrin/discordgo
 
 go 1.13
 
