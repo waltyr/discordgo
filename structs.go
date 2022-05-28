@@ -408,8 +408,10 @@ type ThreadStart struct {
 	Name                string      `json:"name"`
 	AutoArchiveDuration int         `json:"auto_archive_duration,omitempty"`
 	Type                ChannelType `json:"type,omitempty"`
-	Invitable           bool        `json:"invitable"`
+	Invitable           bool        `json:"invitable,omitempty"`
 	RateLimitPerUser    int         `json:"rate_limit_per_user,omitempty"`
+
+	Location string `json:"location,omitempty"`
 }
 
 // ThreadMetadata contains a number of thread-specific channel fields that are not needed by other channel types.
