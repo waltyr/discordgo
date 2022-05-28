@@ -164,6 +164,7 @@ func (s *Session) RequestWithLockedBucket(method, urlStr, contentType string, b 
 		}
 	}
 
+	s.log(LogDebug, "Requesting %s %s with %s", req.Method, req.URL.String(), b)
 	resp, err := s.Client.Do(req)
 	if err != nil {
 		bucket.Release(nil)
@@ -185,6 +186,7 @@ func (s *Session) RequestWithLockedBucket(method, urlStr, contentType string, b 
 	if err != nil {
 		return
 	}
+	s.log(LogDebug, "Response to %s %s: %d / %s", req.Method, req.URL.String(), resp.StatusCode, response)
 
 	if s.Debug {
 
