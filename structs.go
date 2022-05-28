@@ -17,6 +17,7 @@ import (
 	"math"
 	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -1289,11 +1290,26 @@ type ReadStateList struct {
 	Entries []*ReadState `json:"entries"`
 }
 
+type StringOrInt string
+
+func (soi *StringOrInt) UnmarshalJSON(data []byte) error {
+	err := json.Unmarshal(data, (*string)(soi))
+	if err == nil {
+		var val int64
+		err = json.Unmarshal(data, &val)
+		if err == nil {
+			return err
+		}
+		*soi = (StringOrInt)(strconv.FormatInt(val, 10))
+	}
+	return nil
+}
+
 // A ReadState stores data on the read state of channels.
 type ReadState struct {
-	MentionCount  int    `json:"mention_count"`
-	LastMessageID string `json:"last_message_id"`
-	ID            string `json:"id"`
+	MentionCount  int         `json:"mention_count"`
+	LastMessageID StringOrInt `json:"last_message_id"`
+	ID            string      `json:"id"`
 }
 
 // An Ack is used to ack messages

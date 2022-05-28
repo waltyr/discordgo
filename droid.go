@@ -3,6 +3,7 @@ package discordgo
 import (
 	"encoding/base64"
 	"encoding/json"
+	"net/url"
 )
 
 const (
@@ -114,3 +115,20 @@ var (
 		//"Sec-Fetch-Site": "cross-site",
 	}
 )
+
+const (
+	ThreadJoinLocationContextMenu     = "Context Menu"
+	ThreadJoinLocationToolbarOverflow = "Toolbar Overflow"
+	ThreadJoinLocationSidebarOverflow = "Sidebar Overflow"
+)
+
+func (s *Session) ThreadJoinWithLocation(id, location string) error {
+	if !s.IsUser {
+		return s.ThreadJoin(id)
+	}
+	endpoint := EndpointThreadMember(id, "@me") + "?" + url.Values{
+		"location": []string{location},
+	}.Encode()
+	_, err := s.RequestWithBucketID("PUT", endpoint, nil, endpoint)
+	return err
+}
