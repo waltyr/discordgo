@@ -7,9 +7,10 @@ const (
 	droidBrowser           = "Chrome"
 	droidReferrer          = "https://discord.com/channels/@me"
 	droidReferringDomain   = "discord.com"
-	droidClientBuildNumber = "130089"
+	droidClientBuildNumber = "130153"
 	droidReleaseChannel    = "stable"
 	droidStatus            = "online"
+	droidSystemLocale      = "en-US"
 )
 
 const (
@@ -23,5 +24,9 @@ var (
 		"Origin":        "https://discord.com",
 		"Pragma":        "no-cache",
 		"Cache-Control": "no-cache",
+
+		//"Sec-Fetch-Dest": "websocket",
+		//"Sec-Fetch-Mode": "websocket",
+		//"Sec-Fetch-Site": "cross-site",
 	}
 )

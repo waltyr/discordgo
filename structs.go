@@ -1788,6 +1788,7 @@ type IdentifyProperties struct {
 	ClientBuildNumber      string  `json:"client_build_number"`
 	ReleaseChannel         string  `json:"release_channel"`
 	ClientEventSource      *string `json:"client_event_source"`
+	SystemLocale           string  `json:"system_locale"`
 }
 
 // StageInstance holds information about a live stage.

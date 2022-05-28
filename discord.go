@@ -62,6 +62,7 @@ func New(token string) (s *Session, err error) {
 	//s.Identify.Properties.ReferringDomain = droidReferringDomain
 	s.Identify.Properties.ClientBuildNumber = droidClientBuildNumber
 	s.Identify.Properties.ReleaseChannel = droidReleaseChannel
+	s.Identify.Properties.SystemLocale = droidSystemLocale
 	s.Identify.Capabilities = droidCapabilities
 	s.Identify.ClientState.HighestLastMessageID = "0"
 	s.Identify.ClientState.ReadStateVersion = 0
