@@ -49,6 +49,8 @@ type Ready struct {
 	Relationships     []*Relationship        `json:"relationships"`
 	Presences         []*Presence            `json:"presences"`
 	Notes             map[string]string      `json:"notes"`
+
+	Users []*User `json:"users"`
 }
 
 // ChannelCreate is the data for a ChannelCreate event.

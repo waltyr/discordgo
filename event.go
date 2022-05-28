@@ -216,6 +216,22 @@ func setGuildIds(g *Guild) {
 	}
 }
 
+func setPrivateChannelMembers(r *Ready) {
+	users := make(map[string]*User)
+	for _, user := range r.Users {
+		users[user.ID] = user
+	}
+	for _, ch := range r.PrivateChannels {
+		if ch.Recipients != nil || len(ch.RecipientIDs) == 0 {
+			continue
+		}
+		ch.Recipients = make([]*User, len(ch.RecipientIDs))
+		for index, id := range ch.RecipientIDs {
+			ch.Recipients[index] = users[id]
+		}
+	}
+}
+
 // onInterface handles all internal events and routes them to the appropriate internal handler.
 func (s *Session) onInterface(i interface{}) {
 	switch t := i.(type) {
@@ -223,6 +239,7 @@ func (s *Session) onInterface(i interface{}) {
 		for _, g := range t.Guilds {
 			setGuildIds(g)
 		}
+		setPrivateChannelMembers(t)
 		s.onReady(t)
 	case *GuildCreate:
 		setGuildIds(t.Guild)

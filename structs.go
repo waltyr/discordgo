@@ -314,6 +314,8 @@ type Channel struct {
 	// The recipients of the channel. This is only populated in DM channels.
 	Recipients []*User `json:"recipients"`
 
+	RecipientIDs []string `json:"recipient_ids"`
+
 	// The messages in the channel. This is only present in state-cached channels,
 	// and State.MaxMessageCount must be non-zero.
 	Messages []*Message `json:"-"`
