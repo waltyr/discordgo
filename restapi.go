@@ -148,6 +148,16 @@ func (s *Session) RequestWithLockedBucket(method, urlStr, contentType string, b 
 	// TODO: Make a configurable static variable.
 	req.Header.Set("User-Agent", s.UserAgent)
 
+	if s.IsUser {
+		headers := DroidFetchHeaders
+		if strings.HasPrefix(urlStr, "https://cdn.discordapp.com") {
+			headers = DroidDownloadHeaders
+		}
+		for key, value := range headers {
+			req.Header.Set(key, value)
+		}
+	}
+
 	if s.Debug {
 		for k, v := range req.Header {
 			log.Printf("API REQUEST   HEADER :: [%s] = %+v\n", k, v)

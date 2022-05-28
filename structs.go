@@ -1776,31 +1776,6 @@ type IdentifyProperties struct {
 	ReferringDomain string `json:"$referring_domain"`
 }
 
-type UserIdentifyProperties struct {
-	OS                     string  `json:"os"`
-	OSVersion              string  `json:"os_version"`
-	Device                 string  `json:"device"`
-	Browser                string  `json:"browser"`
-	BrowserUserAgent       string  `json:"browser_user_agent"`
-	BrowserVersion         string  `json:"browser_version"`
-	Referrer               string  `json:"referrer"`
-	ReferringDomain        string  `json:"referring_domain"`
-	ReferrerCurrent        string  `json:"referrer_current"`
-	ReferringDomainCurrent string  `json:"referring_domain_current"`
-	ClientBuildNumber      string  `json:"client_build_number"`
-	ReleaseChannel         string  `json:"release_channel"`
-	ClientEventSource      *string `json:"client_event_source"`
-	SystemLocale           string  `json:"system_locale"`
-}
-
-type ClientState struct {
-	GuildHashes              struct{} `json:"guild_hashes"`
-	HighestLastMessageID     string   `json:"highest_last_message_id"`
-	ReadStateVersion         int      `json:"read_state_version"`
-	UserGuildSettingsVersion int      `json:"user_guild_settings_version"`
-	UserSettingsVersion      int      `json:"user_settings_version"`
-}
-
 // StageInstance holds information about a live stage.
 // https://discord.com/developers/docs/resources/stage-instance#stage-instance-resource
 type StageInstance struct {

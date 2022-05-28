@@ -226,6 +226,8 @@ type File struct {
 
 // MessageSend stores all parameters you can send with ChannelMessageSendComplex.
 type MessageSend struct {
+	Nonce string `json:"nonce,omitempty"`
+
 	Content         string                  `json:"content,omitempty"`
 	Embeds          []*MessageEmbed         `json:"embeds"`
 	TTS             bool                    `json:"tts"`

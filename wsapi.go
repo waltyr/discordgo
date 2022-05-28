@@ -78,7 +78,7 @@ func (s *Session) Open() error {
 	header := http.Header{}
 	header.Add("accept-encoding", "zlib")
 	if s.IsUser {
-		for k, v := range droidWSHeaders {
+		for k, v := range DroidWSHeaders {
 			header.Add(k, v)
 		}
 	}

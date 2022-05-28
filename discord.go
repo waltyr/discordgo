@@ -60,18 +60,7 @@ func New(token string) (s *Session, err error) {
 
 	if !strings.HasPrefix(token, "Bot ") {
 		s.Identify.Presence.Status = droidStatus
-		s.Identify.Properties = &UserIdentifyProperties{
-			OS:               droidOS,
-			OSVersion:        droidOSVersion,
-			Browser:          droidBrowser,
-			BrowserVersion:   DroidBrowserVersion,
-			BrowserUserAgent: DroidBrowserUserAgent,
-			//Referrer: droidReferrer,
-			//ReferringDomain: droidReferringDomain,
-			ClientBuildNumber: droidClientBuildNumber,
-			ReleaseChannel:    droidReleaseChannel,
-			SystemLocale:      droidSystemLocale,
-		}
+		s.Identify.Properties = droidIdentifyProperties
 		s.Identify.Capabilities = droidCapabilities
 		s.Identify.ClientState = &ClientState{
 			HighestLastMessageID:     "0",
