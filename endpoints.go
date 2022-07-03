@@ -42,6 +42,7 @@ var (
 	EndpointCDNChannelIcons = EndpointCDN + "channel-icons/"
 	EndpointCDNBanners      = EndpointCDN + "banners/"
 	EndpointCDNGuilds       = EndpointCDN + "guilds/"
+	EndpointCDNStickers     = EndpointCDN + "stickers/"
 
 	EndpointVoice        = EndpointAPI + "/voice/"
 	EndpointVoiceRegions = EndpointVoice + "regions"
@@ -133,7 +134,19 @@ var (
 
 	EndpointGroupIcon = func(cID, hash string) string { return EndpointCDNChannelIcons + cID + "/" + hash + ".png" }
 
-	EndpointSticker            = func(sID string) string { return EndpointStickers + sID }
+	EndpointSticker      = func(sID string) string { return EndpointStickers + sID }
+	EndpointStickerImage = func(sID string, format StickerFormat) string {
+		var ext string
+		switch format {
+		case StickerFormatTypePNG:
+			ext = ".png"
+		case StickerFormatTypeAPNG:
+			ext = ".apng"
+		case StickerFormatTypeLottie:
+			ext = ".json" // TODO is this correct?
+		}
+		return EndpointCDNStickers + sID + ext
+	}
 	EndpointNitroStickersPacks = EndpointAPI + "/sticker-packs"
 
 	EndpointChannelWebhooks = func(cID string) string { return EndpointChannel(cID) + "/webhooks" }

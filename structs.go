@@ -530,6 +530,10 @@ type Sticker struct {
 	SortValue   int           `json:"sort_value"`
 }
 
+func (sticker *Sticker) URL() string {
+	return EndpointStickerImage(sticker.ID, sticker.FormatType)
+}
+
 // StickerPack represents a pack of standard stickers.
 type StickerPack struct {
 	ID             string     `json:"id"`
