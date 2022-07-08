@@ -43,6 +43,7 @@ var (
 	EndpointCDNBanners      = EndpointCDN + "banners/"
 	EndpointCDNGuilds       = EndpointCDN + "guilds/"
 	EndpointCDNStickers     = EndpointCDN + "stickers/"
+	EndpointCDNRoleIcons    = EndpointCDN + "role-icons/"
 
 	EndpointVoice        = EndpointAPI + "/voice/"
 	EndpointVoiceRegions = EndpointVoice + "regions"
@@ -133,6 +134,7 @@ var (
 	EndpointThreadMember                        = func(tID, mID string) string { return EndpointThreadMembers(tID) + "/" + mID }
 
 	EndpointGroupIcon = func(cID, hash string) string { return EndpointCDNChannelIcons + cID + "/" + hash + ".png" }
+	EndpointRoleIcon  = func(roleID, hash string) string { return EndpointCDNRoleIcons + roleID + "/" + hash + ".png" }
 
 	EndpointSticker      = func(sID string) string { return EndpointStickers + sID }
 	EndpointStickerImage = func(sID string, format StickerFormat) string {

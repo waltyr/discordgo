@@ -1071,6 +1071,9 @@ type Role struct {
 	// The name of the role.
 	Name string `json:"name"`
 
+	// The icon hash of the role.
+	Icon string `json:"icon"`
+
 	// Whether this role is managed by an integration, and
 	// thus cannot be manually added to, or taken from, members.
 	Managed bool `json:"managed"`
