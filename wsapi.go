@@ -445,6 +445,30 @@ type requestGuildMembersOp struct {
 	Data requestGuildMembersData `json:"d"`
 }
 
+type markViewingData struct {
+	ChannelID string `json:"channel_id"`
+}
+
+type markViewingOp struct {
+	Op   int             `json:"op"`
+	Data markViewingData `json:"d"`
+}
+
+type GuildSubscribeData struct {
+	GuildID           string             `json:"guild_id"`
+	Channels          map[string][][]int `json:"channels"`
+	Typing            bool               `json:"typing,omitempty"`
+	Activities        bool               `json:"activities,omitempty"`
+	Threads           bool               `json:"threads,omitempty"`
+	Members           []string           `json:"members,omitempty"`
+	ThreadMemberLists []string           `json:"thread_member_lists,omitempty"`
+}
+
+type guildSubscribeOp struct {
+	Op   int                `json:"op"`
+	Data GuildSubscribeData `json:"d"`
+}
+
 // RequestGuildMembers requests guild members from the gateway
 // The gateway responds with GuildMembersChunk events
 // guildID   : Single Guild ID to request members of
@@ -520,6 +544,38 @@ func (s *Session) requestGuildMembers(data requestGuildMembersData) (err error) 
 
 	s.wsMutex.Lock()
 	err = s.wsConn.WriteJSON(requestGuildMembersOp{8, data})
+	s.wsMutex.Unlock()
+
+	return
+}
+
+func (s *Session) MarkViewing(channelID string) (err error) {
+	s.log(LogInformational, "called")
+
+	s.RLock()
+	defer s.RUnlock()
+	if s.wsConn == nil {
+		return ErrWSNotFound
+	}
+
+	s.wsMutex.Lock()
+	err = s.wsConn.WriteJSON(markViewingOp{13, markViewingData{channelID}})
+	s.wsMutex.Unlock()
+
+	return
+}
+
+func (s *Session) SubscribeGuild(dat GuildSubscribeData) (err error) {
+	s.log(LogInformational, "called")
+
+	s.RLock()
+	defer s.RUnlock()
+	if s.wsConn == nil {
+		return ErrWSNotFound
+	}
+
+	s.wsMutex.Lock()
+	err = s.wsConn.WriteJSON(guildSubscribeOp{14, dat})
 	s.wsMutex.Unlock()
 
 	return
