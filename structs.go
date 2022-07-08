@@ -1697,9 +1697,11 @@ type SessionInformation struct {
 // https://discord.com/developers/docs/topics/gateway#update-status-gateway-status-update-structure
 type GatewayStatusUpdate struct {
 	Since  int      `json:"since"`
-	Game   Activity `json:"game"`
+	Game   Activity `json:"-"`
 	Status string   `json:"status"`
 	AFK    bool     `json:"afk"`
+
+	Activities []Activity `json:"activities"`
 }
 
 // Activity defines the Activity sent with GatewayStatusUpdate
@@ -1795,11 +1797,11 @@ type Identify struct {
 	Token          string              `json:"token"`
 	Capabilities   int                 `json:"capabilities,omitempty"`
 	Properties     interface{}         `json:"properties"`
+	Presence       GatewayStatusUpdate `json:"presence,omitempty"`
 	Compress       bool                `json:"compress"`
 	ClientState    *ClientState        `json:"client_state,omitempty"`
 	LargeThreshold int                 `json:"large_threshold,omitempty"`
 	Shard          *[2]int             `json:"shard,omitempty"`
-	Presence       GatewayStatusUpdate `json:"presence,omitempty"`
 	Intents        Intent              `json:"intents,omitempty"`
 }
 

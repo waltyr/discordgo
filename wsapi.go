@@ -905,7 +905,8 @@ func (s *Session) identify() error {
 
 	// Send Identify packet to Discord
 	op := identifyOp{2, s.Identify}
-	s.log(LogDebug, "Identify Packet: \n%#v", op)
+	dat, _ := json.Marshal(s.Identify)
+	s.log(LogDebug, "Identify Packet: %s", dat)
 	s.wsMutex.Lock()
 	err := s.wsConn.WriteJSON(op)
 	s.wsMutex.Unlock()

@@ -26,19 +26,19 @@ const (
 
 type UserIdentifyProperties struct {
 	OS                     string  `json:"os"`
-	OSVersion              string  `json:"os_version"`
-	Device                 string  `json:"device"`
 	Browser                string  `json:"browser"`
+	Device                 string  `json:"device"`
+	SystemLocale           string  `json:"system_locale"`
 	BrowserUserAgent       string  `json:"browser_user_agent"`
 	BrowserVersion         string  `json:"browser_version"`
+	OSVersion              string  `json:"os_version"`
 	Referrer               string  `json:"referrer"`
 	ReferringDomain        string  `json:"referring_domain"`
 	ReferrerCurrent        string  `json:"referrer_current"`
 	ReferringDomainCurrent string  `json:"referring_domain_current"`
-	ClientBuildNumber      string  `json:"client_build_number"`
 	ReleaseChannel         string  `json:"release_channel"`
+	ClientBuildNumber      string  `json:"client_build_number"`
 	ClientEventSource      *string `json:"client_event_source"`
-	SystemLocale           string  `json:"system_locale"`
 }
 
 type ClientState struct {
