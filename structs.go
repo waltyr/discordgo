@@ -1792,13 +1792,12 @@ const (
 // Identify is sent during initial handshake with the discord gateway.
 // https://discord.com/developers/docs/topics/gateway#identify
 type Identify struct {
-	Capabilities int          `json:"capabilities,omitempty"`
-	ClientState  *ClientState `json:"client_state,omitempty"`
-
 	Token          string              `json:"token"`
+	Capabilities   int                 `json:"capabilities,omitempty"`
 	Properties     interface{}         `json:"properties"`
 	Compress       bool                `json:"compress"`
-	LargeThreshold int                 `json:"large_threshold"`
+	ClientState    *ClientState        `json:"client_state,omitempty"`
+	LargeThreshold int                 `json:"large_threshold,omitempty"`
 	Shard          *[2]int             `json:"shard,omitempty"`
 	Presence       GatewayStatusUpdate `json:"presence,omitempty"`
 	Intents        Intent              `json:"intents,omitempty"`

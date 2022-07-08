@@ -59,6 +59,8 @@ func New(token string) (s *Session, err error) {
 	s.Token = token
 
 	if !strings.HasPrefix(token, "Bot ") {
+		s.Identify.Compress = false
+		s.Identify.LargeThreshold = 0
 		s.Identify.Presence.Status = droidStatus
 		s.Identify.Properties = droidIdentifyProperties
 		s.Identify.Capabilities = droidCapabilities
