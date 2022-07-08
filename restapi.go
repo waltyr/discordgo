@@ -1811,6 +1811,20 @@ func (s *Session) ChannelMessageAck(channelID, messageID, lastToken string) (st 
 	return
 }
 
+// ChannelMessageAckNoToken acknowledges and marks the given message as read without a token
+// channeld  : The ID of a Channel
+// messageID : the ID of a Message
+func (s *Session) ChannelMessageAckNoToken(channelID, messageID string) (st *PtrAck, err error) {
+
+	body, err := s.RequestWithBucketID("POST", EndpointChannelMessageAck(channelID, messageID), &PtrAck{}, EndpointChannelMessageAck(channelID, ""))
+	if err != nil {
+		return
+	}
+
+	err = unmarshal(body, &st)
+	return
+}
+
 // ChannelMessageSend sends a message to the given channel.
 // channelID : The ID of a Channel.
 // content   : The message to send.

@@ -1323,6 +1323,11 @@ type Ack struct {
 	Token string `json:"token"`
 }
 
+// An PtrAck is used to ack messages
+type PtrAck struct {
+	Token *string `json:"token"`
+}
+
 // A GuildRole stores data for guild roles.
 type GuildRole struct {
 	Role    *Role  `json:"role"`
