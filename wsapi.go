@@ -70,7 +70,7 @@ func (s *Session) Open() error {
 		}
 
 		// Add the version and encoding to the URL
-		s.gateway = s.gateway + "?v=" + APIVersion + "&encoding=json"
+		s.gateway = s.gateway + "?encoding=json&v=" + APIVersion // + "&compress=zlib-stream"
 	}
 
 	// Connect to the Gateway

@@ -249,6 +249,7 @@ type GuildScheduledEventUserRemove struct {
 
 // MessageAck is the data for a MessageAck event.
 type MessageAck struct {
+	Version   int    `json:"version"`
 	MessageID string `json:"message_id"`
 	ChannelID string `json:"channel_id"`
 }

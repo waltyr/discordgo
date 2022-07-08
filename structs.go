@@ -1300,10 +1300,10 @@ type StringOrInt string
 
 func (soi *StringOrInt) UnmarshalJSON(data []byte) error {
 	err := json.Unmarshal(data, (*string)(soi))
-	if err == nil {
+	if err != nil {
 		var val int64
 		err = json.Unmarshal(data, &val)
-		if err == nil {
+		if err != nil {
 			return err
 		}
 		*soi = (StringOrInt)(strconv.FormatInt(val, 10))
