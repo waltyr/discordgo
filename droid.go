@@ -13,14 +13,14 @@ const (
 	droidBrowser           = "Chrome"
 	droidReferrer          = "https://discord.com/channels/@me"
 	droidReferringDomain   = "discord.com"
-	droidClientBuildNumber = "130153"
+	droidClientBuildNumber = "135402"
 	droidReleaseChannel    = "stable"
 	droidStatus            = "online"
 	droidSystemLocale      = "en-US"
 )
 
 const (
-	DroidBrowserVersion   = "102.0.5005.61"
+	DroidBrowserVersion   = "103.0.5060.114"
 	DroidBrowserUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/" + DroidBrowserVersion + " Safari/537.36"
 )
 
@@ -81,7 +81,7 @@ var (
 		SystemLocale:      droidSystemLocale,
 	}
 	DroidFetchHeaders = map[string]string{
-		"Sec-CH-UA":          `" Not A;Brand";v="99", "Chromium";v="102", "Google Chrome";v="102"`,
+		"Sec-CH-UA":          `" Not A;Brand";v="99", "Chromium";v="103", "Google Chrome";v="103"`,
 		"Sec-CH-UA-Mobile":   "?0",
 		"Sec-CH-UA-Platform": droidOS,
 		"Sec-Fetch-Dest":     "empty",
@@ -109,6 +109,7 @@ var (
 		"Accept-Language": "en-US,en;q=0.9",
 		"Pragma":          "no-cache",
 		"Cache-Control":   "no-cache",
+		"Accept-Encoding": "gzip, deflate, br",
 
 		//"Sec-Fetch-Dest": "websocket",
 		//"Sec-Fetch-Mode": "websocket",

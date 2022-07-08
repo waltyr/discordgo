@@ -14,6 +14,7 @@ package discordgo
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"math"
 	"net/http"
 	"regexp"
@@ -115,6 +116,11 @@ type Session struct {
 
 	// The websocket connection.
 	wsConn *websocket.Conn
+
+	zlibReader     io.ReadCloser
+	zlibJSON       *json.Decoder
+	zlibPipeReader *io.PipeReader
+	zlibPipeWriter *io.PipeWriter
 
 	// When nil, the session is not listening.
 	listening chan interface{}

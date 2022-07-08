@@ -11,7 +11,6 @@
 package discordgo
 
 import (
-	"bytes"
 	"compress/zlib"
 	"encoding/json"
 	"errors"
@@ -45,6 +44,20 @@ type resumePacket struct {
 	} `json:"d"`
 }
 
+func (s *Session) closeZLib() {
+	if s.zlibReader != nil {
+		_ = s.zlibReader.Close()
+	}
+	if s.zlibReader != nil {
+		_ = s.zlibPipeReader.Close()
+		_ = s.zlibPipeWriter.Close()
+	}
+	s.zlibJSON = nil
+	s.zlibPipeReader = nil
+	s.zlibPipeWriter = nil
+	s.zlibReader = nil
+}
+
 // Open creates a websocket connection to Discord.
 // See: https://discord.com/developers/docs/topics/gateway#connecting
 func (s *Session) Open() error {
@@ -70,23 +83,26 @@ func (s *Session) Open() error {
 		}
 
 		// Add the version and encoding to the URL
-		s.gateway = s.gateway + "?encoding=json&v=" + APIVersion // + "&compress=zlib-stream"
+		s.gateway = s.gateway + "?encoding=json&v=" + APIVersion + "&compress=zlib-stream"
 	}
+
+	s.zlibPipeReader, s.zlibPipeWriter = io.Pipe()
 
 	// Connect to the Gateway
 	s.log(LogInformational, "connecting to gateway %s", s.gateway)
 	header := http.Header{}
-	header.Add("accept-encoding", "zlib")
 	if s.IsUser {
 		for k, v := range DroidWSHeaders {
 			header.Add(k, v)
 		}
 	}
+
 	s.wsConn, _, err = websocket.DefaultDialer.Dial(s.gateway, header)
 	if err != nil {
 		s.log(LogError, "error connecting to gateway %s, %s", s.gateway, err)
 		s.gateway = "" // clear cached gateway
 		s.wsConn = nil // Just to be safe.
+		s.closeZLib()
 		return err
 	}
 
@@ -101,6 +117,7 @@ func (s *Session) Open() error {
 		if err != nil {
 			s.wsConn.Close()
 			s.wsConn = nil
+			s.closeZLib()
 		}
 	}()
 
@@ -517,36 +534,39 @@ func (s *Session) requestGuildMembers(data requestGuildMembersData) (err error) 
 // If you use the AddHandler() function to register a handler for the
 // "OnEvent" event then all events will be passed to that handler.
 func (s *Session) onEvent(messageType int, message []byte) (*Event, error) {
-
 	var err error
-	var reader io.Reader
-	reader = bytes.NewBuffer(message)
-
-	// If this is a compressed message, uncompress it.
-	if messageType == websocket.BinaryMessage {
-
-		z, err2 := zlib.NewReader(reader)
-		if err2 != nil {
-			s.log(LogError, "error uncompressing websocket message, %s", err)
-			return nil, err2
-		}
-
-		defer func() {
-			err3 := z.Close()
-			if err3 != nil {
-				s.log(LogWarning, "error closing zlib, %s", err)
-			}
-		}()
-
-		reader = z
-	}
 
 	// Decode the event into an Event struct.
 	var e *Event
-	decoder := json.NewDecoder(reader)
-	if err = decoder.Decode(&e); err != nil {
-		s.log(LogError, "error decoding websocket message, %s", err)
-		return e, err
+
+	// If this is a compressed message, uncompress it.
+	if messageType == websocket.BinaryMessage {
+		go func() {
+			_, innerErr := s.zlibPipeWriter.Write(message)
+			if innerErr != nil {
+				s.log(LogError, "error writing websocket message to zlib pipe: %v", innerErr)
+			}
+		}()
+
+		if s.zlibReader == nil {
+			s.zlibReader, err = zlib.NewReader(s.zlibPipeReader)
+			if err != nil {
+				s.log(LogError, "error preparing zlib reader: %v", err)
+				s.zlibReader = nil
+				return nil, err
+			}
+			s.zlibJSON = json.NewDecoder(s.zlibReader)
+		}
+
+		if err = s.zlibJSON.Decode(&e); err != nil {
+			s.log(LogError, "error decoding websocket message, %s", err)
+			return e, err
+		}
+	} else {
+		if err = json.Unmarshal(message, &e); err != nil {
+			s.log(LogError, "error decoding websocket message, %s", err)
+			return e, err
+		}
 	}
 
 	s.log(LogDebug, "Op: %d, Seq: %d, Type: %s, Data: %s\n\n", e.Operation, e.Sequence, e.Type, string(e.RawData))
@@ -939,6 +959,7 @@ func (s *Session) CloseWithCode(closeCode int) (err error) {
 		}
 
 		s.wsConn = nil
+		s.closeZLib()
 	}
 
 	s.Unlock()
