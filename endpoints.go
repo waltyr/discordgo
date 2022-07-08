@@ -138,12 +138,10 @@ var (
 	EndpointStickerImage = func(sID string, format StickerFormat) string {
 		var ext string
 		switch format {
-		case StickerFormatTypePNG:
+		case StickerFormatTypePNG, StickerFormatTypeAPNG:
 			ext = ".png"
-		case StickerFormatTypeAPNG:
-			ext = ".apng"
 		case StickerFormatTypeLottie:
-			ext = ".json" // TODO is this correct?
+			ext = ".json"
 		}
 		return EndpointCDNStickers + sID + ext
 	}
