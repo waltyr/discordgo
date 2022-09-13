@@ -247,6 +247,8 @@ var (
 	EndpointResetPassword  = EndpointAuth + "reset"
 	EndpointRegister       = EndpointAuth + "register"
 
+	EndpointRemoteAuthLogin = EndpointUsers + "@me/remote-auth/login"
+
 	EndpointVoiceIce = EndpointVoice + "ice"
 
 	EndpointTutorial           = EndpointAPI + "tutorial/"

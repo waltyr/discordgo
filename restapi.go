@@ -290,6 +290,30 @@ func (s *Session) Login(email, password string) (err error) {
 	return
 }
 
+func (s *Session) RemoteAuthLogin(ticket string) (encryptedToken string, err error) {
+
+	data := struct {
+		Ticket string `json:"ticket"`
+	}{ticket}
+
+	response, err := s.RequestWithBucketID("POST", EndpointRemoteAuthLogin, data, EndpointRemoteAuthLogin)
+	if err != nil {
+		return
+	}
+
+	temp := struct {
+		EncryptedToken string `json:"encrypted_token"`
+	}{}
+
+	err = unmarshal(response, &temp)
+	if err != nil {
+		return
+	}
+
+	encryptedToken = temp.EncryptedToken
+	return
+}
+
 // Register sends a Register request to Discord, and returns the authentication token
 // Note that this account is temporary and should be verified for future use.
 // Another option is to save the authentication token external, but this isn't recommended.
