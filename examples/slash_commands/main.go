@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -32,7 +33,9 @@ func init() {
 }
 
 var (
-	integerOptionMinValue = 1.0
+	integerOptionMinValue          = 1.0
+	dmPermission                   = false
+	defaultMemberPermissions int64 = discordgo.PermissionManageServer
 
 	commands = []*discordgo.ApplicationCommand{
 		{
@@ -41,6 +44,12 @@ var (
 			// Commands/options without description will fail the registration
 			// of the command.
 			Description: "Basic command",
+		},
+		{
+			Name:                     "permission-overview",
+			Description:              "Command for demonstration of default command permissions",
+			DefaultMemberPermissions: &defaultMemberPermissions,
+			DMPermission:             &dmPermission,
 		},
 		{
 			Name:        "basic-command-with-files",
@@ -320,6 +329,84 @@ var (
 				},
 			})
 		},
+		"permission-overview": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			perms, err := s.ApplicationCommandPermissions(s.State.User.ID, i.GuildID, i.ApplicationCommandData().ID)
+
+			var restError *discordgo.RESTError
+			if errors.As(err, &restError) && restError.Message != nil && restError.Message.Code == discordgo.ErrCodeUnknownApplicationCommandPermissions {
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: ":x: No permission overwrites",
+					},
+				})
+				return
+			} else if err != nil {
+				panic(err)
+			}
+
+			if err != nil {
+				panic(err)
+			}
+			format := "- %s %s\n"
+
+			channels := ""
+			users := ""
+			roles := ""
+
+			for _, o := range perms.Permissions {
+				emoji := "❌"
+				if o.Permission {
+					emoji = "☑"
+				}
+
+				switch o.Type {
+				case discordgo.ApplicationCommandPermissionTypeUser:
+					users += fmt.Sprintf(format, emoji, "<@!"+o.ID+">")
+				case discordgo.ApplicationCommandPermissionTypeChannel:
+					allChannels, _ := discordgo.GuildAllChannelsID(i.GuildID)
+
+					if o.ID == allChannels {
+						channels += fmt.Sprintf(format, emoji, "All channels")
+					} else {
+						channels += fmt.Sprintf(format, emoji, "<#"+o.ID+">")
+					}
+				case discordgo.ApplicationCommandPermissionTypeRole:
+					if o.ID == i.GuildID {
+						roles += fmt.Sprintf(format, emoji, "@everyone")
+					} else {
+						roles += fmt.Sprintf(format, emoji, "<@&"+o.ID+">")
+					}
+				}
+			}
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Embeds: []*discordgo.MessageEmbed{
+						{
+							Title:       "Permissions overview",
+							Description: "Overview of permissions for this command",
+							Fields: []*discordgo.MessageEmbedField{
+								{
+									Name:  "Users",
+									Value: users,
+								},
+								{
+									Name:  "Channels",
+									Value: channels,
+								},
+								{
+									Name:  "Roles",
+									Value: roles,
+								},
+							},
+						},
+					},
+					AllowedMentions: &discordgo.MessageAllowedMentions{},
+				},
+			})
+		},
 		"subcommands": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			options := i.ApplicationCommandData().Options
 			content := ""
@@ -389,10 +476,11 @@ var (
 				return
 			}
 			time.AfterFunc(time.Second*5, func() {
+				content := content + "\n\nWell, now you know how to create and edit responses. " +
+					"But you still don't know how to delete them... so... wait 10 seconds and this " +
+					"message will be deleted."
 				_, err = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-					Content: content + "\n\nWell, now you know how to create and edit responses. " +
-						"But you still don't know how to delete them... so... wait 10 seconds and this " +
-						"message will be deleted.",
+					Content: &content,
 				})
 				if err != nil {
 					s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
@@ -415,7 +503,7 @@ var (
 					// Note: this isn't documented, but you can use that if you want to.
 					// This flag just allows you to create messages visible only for the caller of the command
 					// (user who triggered the command)
-					Flags:   1 << 6,
+					Flags:   discordgo.MessageFlagsEphemeral,
 					Content: "Surprise!",
 				},
 			})
@@ -430,8 +518,9 @@ var (
 			}
 			time.Sleep(time.Second * 5)
 
+			content := "Now the original message is gone and after 10 seconds this message will ~~self-destruct~~ be deleted."
 			s.FollowupMessageEdit(i.Interaction, msg.ID, &discordgo.WebhookEdit{
-				Content: "Now the original message is gone and after 10 seconds this message will ~~self-destruct~~ be deleted.",
+				Content: &content,
 			})
 
 			time.Sleep(time.Second * 10)
