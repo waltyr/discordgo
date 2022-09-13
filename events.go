@@ -51,8 +51,6 @@ type Ready struct {
 	Notes             map[string]string      `json:"notes"`
 
 	Users []*User `json:"users"`
-
-	// TODO: Application and Shard
 }
 
 // ChannelCreate is the data for a ChannelCreate event.
@@ -249,6 +247,13 @@ type GuildScheduledEventUserRemove struct {
 	GuildID               string `json:"guild_id"`
 }
 
+// MessageAck is the data for a MessageAck event.
+type MessageAck struct {
+	Version   int    `json:"version"`
+	MessageID string `json:"message_id"`
+	ChannelID string `json:"channel_id"`
+}
+
 // MessageCreate is the data for a MessageCreate event.
 type MessageCreate struct {
 	*Message
@@ -312,6 +317,16 @@ type Resumed struct {
 	Trace []string `json:"_trace"`
 }
 
+// RelationshipAdd is the data for a RelationshipAdd event.
+type RelationshipAdd struct {
+	*Relationship
+}
+
+// RelationshipRemove is the data for a RelationshipRemove event.
+type RelationshipRemove struct {
+	*Relationship
+}
+
 // TypingStart is the data for a TypingStart event.
 type TypingStart struct {
 	UserID    string `json:"user_id"`
@@ -323,6 +338,20 @@ type TypingStart struct {
 // UserUpdate is the data for a UserUpdate event.
 type UserUpdate struct {
 	*User
+}
+
+// UserSettingsUpdate is the data for a UserSettingsUpdate event.
+type UserSettingsUpdate map[string]interface{}
+
+// UserGuildSettingsUpdate is the data for a UserGuildSettingsUpdate event.
+type UserGuildSettingsUpdate struct {
+	*UserGuildSettings
+}
+
+// UserNoteUpdate is the data for a UserNoteUpdate event.
+type UserNoteUpdate struct {
+	ID   string `json:"id"`
+	Note string `json:"note"`
 }
 
 // VoiceServerUpdate is the data for a VoiceServerUpdate event.

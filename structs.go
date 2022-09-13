@@ -209,8 +209,23 @@ type IntegrationAccount struct {
 
 // A VoiceRegion stores data for a specific voice region server.
 type VoiceRegion struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Hostname string `json:"sample_hostname"`
+	Port     int    `json:"sample_port"`
+}
+
+// A VoiceICE stores data for voice ICE servers.
+type VoiceICE struct {
+	TTL     string       `json:"ttl"`
+	Servers []*ICEServer `json:"servers"`
+}
+
+// A ICEServer stores data for a specific voice ICE server.
+type ICEServer struct {
+	URL        string `json:"url"`
+	Username   string `json:"username"`
+	Credential string `json:"credential"`
 }
 
 // InviteTargetType indicates the type of target of an invite
@@ -1283,6 +1298,25 @@ func (m *Member) AvatarURL(size string) string {
 
 }
 
+// A Settings stores data for a specific users Discord client settings.
+type Settings struct {
+	RenderEmbeds           bool               `json:"render_embeds"`
+	InlineEmbedMedia       bool               `json:"inline_embed_media"`
+	InlineAttachmentMedia  bool               `json:"inline_attachment_media"`
+	EnableTTSCommand       bool               `json:"enable_tts_command"`
+	MessageDisplayCompact  bool               `json:"message_display_compact"`
+	ShowCurrentGame        bool               `json:"show_current_game"`
+	ConvertEmoticons       bool               `json:"convert_emoticons"`
+	Locale                 string             `json:"locale"`
+	Theme                  string             `json:"theme"`
+	GuildPositions         []string           `json:"guild_positions"`
+	RestrictedGuilds       []string           `json:"restricted_guilds"`
+	FriendSourceFlags      *FriendSourceFlags `json:"friend_source_flags"`
+	Status                 Status             `json:"status"`
+	DetectPlatformAccounts bool               `json:"detect_platform_accounts"`
+	DeveloperMode          bool               `json:"developer_mode"`
+}
+
 // Status type definition
 type Status string
 
@@ -1294,6 +1328,20 @@ const (
 	StatusInvisible    Status = "invisible"
 	StatusOffline      Status = "offline"
 )
+
+// FriendSourceFlags stores ... TODO :)
+type FriendSourceFlags struct {
+	All           bool `json:"all"`
+	MutualGuilds  bool `json:"mutual_guilds"`
+	MutualFriends bool `json:"mutual_friends"`
+}
+
+// A Relationship between the logged in user and Relationship.User
+type Relationship struct {
+	User *User  `json:"user"`
+	Type int    `json:"type"` // 1 = friend, 2 = blocked, 3 = incoming friend req, 4 = sent friend req
+	ID   string `json:"id"`
+}
 
 // A TooManyRequests struct holds information received from Discord
 // when receiving a HTTP 429 response.
@@ -1729,6 +1777,38 @@ const (
 
 	AuditLogActionApplicationCommandPermissionUpdate AuditLogAction = 121
 )
+
+// A UserGuildSettingsChannelOverride stores data for a channel override for a users guild settings.
+type UserGuildSettingsChannelOverride struct {
+	Muted                bool   `json:"muted"`
+	MessageNotifications int    `json:"message_notifications"`
+	ChannelID            string `json:"channel_id"`
+}
+
+type UserGuildSettingsList struct {
+	Version int                  `json:"version"`
+	Partial bool                 `json:"partial"`
+	Entries []*UserGuildSettings `json:"entries"`
+}
+
+// A UserGuildSettings stores data for a users guild settings.
+type UserGuildSettings struct {
+	SupressEveryone      bool                                `json:"suppress_everyone"`
+	Muted                bool                                `json:"muted"`
+	MobilePush           bool                                `json:"mobile_push"`
+	MessageNotifications int                                 `json:"message_notifications"`
+	GuildID              string                              `json:"guild_id"`
+	ChannelOverrides     []*UserGuildSettingsChannelOverride `json:"channel_overrides"`
+}
+
+// A UserGuildSettingsEdit stores data for editing UserGuildSettings
+type UserGuildSettingsEdit struct {
+	SupressEveryone      bool                                         `json:"suppress_everyone"`
+	Muted                bool                                         `json:"muted"`
+	MobilePush           bool                                         `json:"mobile_push"`
+	MessageNotifications int                                          `json:"message_notifications"`
+	ChannelOverrides     map[string]*UserGuildSettingsChannelOverride `json:"channel_overrides"`
+}
 
 // GuildMemberParams stores data needed to update a member
 // https://discord.com/developers/docs/resources/guild#modify-guild-member
