@@ -18,6 +18,7 @@ const (
 	channelUpdateEventType                       = "CHANNEL_UPDATE"
 	connectEventType                             = "__CONNECT__"
 	disconnectEventType                          = "__DISCONNECT__"
+	invalidAuthEventType                         = "__INVALID_AUTH__"
 	eventEventType                               = "__EVENT__"
 	guildBanAddEventType                         = "GUILD_BAN_ADD"
 	guildBanRemoveEventType                      = "GUILD_BAN_REMOVE"
@@ -281,6 +282,21 @@ func (eh disconnectEventHandler) Type() string {
 // Handle is the handler for Disconnect events.
 func (eh disconnectEventHandler) Handle(s *Session, i interface{}) {
 	if t, ok := i.(*Disconnect); ok {
+		eh(s, t)
+	}
+}
+
+// invalidAuthEventHandler is an event handler for InvalidAuth events.
+type invalidAuthEventHandler func(*Session, *InvalidAuth)
+
+// Type returns the event type for InvalidAuth events.
+func (eh invalidAuthEventHandler) Type() string {
+	return invalidAuthEventType
+}
+
+// Handle is the handler for InvalidAuth events.
+func (eh invalidAuthEventHandler) Handle(s *Session, i interface{}) {
+	if t, ok := i.(*InvalidAuth); ok {
 		eh(s, t)
 	}
 }
@@ -1401,6 +1417,8 @@ func handlerForInterface(handler interface{}) EventHandler {
 		return connectEventHandler(v)
 	case func(*Session, *Disconnect):
 		return disconnectEventHandler(v)
+	case func(*Session, *InvalidAuth):
+		return invalidAuthEventHandler(v)
 	case func(*Session, *Event):
 		return eventEventHandler(v)
 	case func(*Session, *GuildBanAdd):

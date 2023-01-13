@@ -251,11 +251,25 @@ func (s *Session) listen(wsConn *websocket.Conn, listening <-chan interface{}) {
 			if sameConnection {
 
 				s.log(LogWarning, "error reading from gateway %s websocket, %s", s.gateway, err)
+
+				wsCloseErr := &websocket.CloseError{}
+				if !errors.As(err, &wsCloseErr) {
+					wsCloseErr = nil
+				}
 				// There has been an error reading, close the websocket so that
 				// OnDisconnect event is emitted.
 				err := s.Close()
 				if err != nil {
 					s.log(LogWarning, "error closing session connection, %s", err)
+				}
+
+				if wsCloseErr != nil {
+					switch wsCloseErr.Code {
+					case 4004:
+						s.log(LogInformational, "emit invalid auth event")
+						s.handleEvent(invalidAuthEventType, InvalidAuth{})
+						return
+					}
 				}
 
 				s.log(LogInformational, "calling reconnect() now")
