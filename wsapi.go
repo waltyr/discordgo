@@ -267,7 +267,7 @@ func (s *Session) listen(wsConn *websocket.Conn, listening <-chan interface{}) {
 					switch wsCloseErr.Code {
 					case 4004:
 						s.log(LogInformational, "emit invalid auth event")
-						s.handleEvent(invalidAuthEventType, InvalidAuth{})
+						s.handleEvent(invalidAuthEventType, &InvalidAuth{})
 						return
 					}
 				}
