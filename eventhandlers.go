@@ -18,7 +18,6 @@ const (
 	channelUpdateEventType                       = "CHANNEL_UPDATE"
 	connectEventType                             = "__CONNECT__"
 	disconnectEventType                          = "__DISCONNECT__"
-	invalidAuthEventType                         = "__INVALID_AUTH__"
 	eventEventType                               = "__EVENT__"
 	guildBanAddEventType                         = "GUILD_BAN_ADD"
 	guildBanRemoveEventType                      = "GUILD_BAN_REMOVE"
@@ -40,6 +39,7 @@ const (
 	guildScheduledEventUserRemoveEventType       = "GUILD_SCHEDULED_EVENT_USER_REMOVE"
 	guildUpdateEventType                         = "GUILD_UPDATE"
 	interactionCreateEventType                   = "INTERACTION_CREATE"
+	invalidAuthEventType                         = "__INVALID_AUTH__"
 	inviteCreateEventType                        = "INVITE_CREATE"
 	inviteDeleteEventType                        = "INVITE_DELETE"
 	messageAckEventType                          = "MESSAGE_ACK"
@@ -282,21 +282,6 @@ func (eh disconnectEventHandler) Type() string {
 // Handle is the handler for Disconnect events.
 func (eh disconnectEventHandler) Handle(s *Session, i interface{}) {
 	if t, ok := i.(*Disconnect); ok {
-		eh(s, t)
-	}
-}
-
-// invalidAuthEventHandler is an event handler for InvalidAuth events.
-type invalidAuthEventHandler func(*Session, *InvalidAuth)
-
-// Type returns the event type for InvalidAuth events.
-func (eh invalidAuthEventHandler) Type() string {
-	return invalidAuthEventType
-}
-
-// Handle is the handler for InvalidAuth events.
-func (eh invalidAuthEventHandler) Handle(s *Session, i interface{}) {
-	if t, ok := i.(*InvalidAuth); ok {
 		eh(s, t)
 	}
 }
@@ -712,6 +697,21 @@ func (eh interactionCreateEventHandler) New() interface{} {
 // Handle is the handler for InteractionCreate events.
 func (eh interactionCreateEventHandler) Handle(s *Session, i interface{}) {
 	if t, ok := i.(*InteractionCreate); ok {
+		eh(s, t)
+	}
+}
+
+// invalidAuthEventHandler is an event handler for InvalidAuth events.
+type invalidAuthEventHandler func(*Session, *InvalidAuth)
+
+// Type returns the event type for InvalidAuth events.
+func (eh invalidAuthEventHandler) Type() string {
+	return invalidAuthEventType
+}
+
+// Handle is the handler for InvalidAuth events.
+func (eh invalidAuthEventHandler) Handle(s *Session, i interface{}) {
+	if t, ok := i.(*InvalidAuth); ok {
 		eh(s, t)
 	}
 }
@@ -1417,8 +1417,6 @@ func handlerForInterface(handler interface{}) EventHandler {
 		return connectEventHandler(v)
 	case func(*Session, *Disconnect):
 		return disconnectEventHandler(v)
-	case func(*Session, *InvalidAuth):
-		return invalidAuthEventHandler(v)
 	case func(*Session, *Event):
 		return eventEventHandler(v)
 	case func(*Session, *GuildBanAdd):
@@ -1461,6 +1459,8 @@ func handlerForInterface(handler interface{}) EventHandler {
 		return guildUpdateEventHandler(v)
 	case func(*Session, *InteractionCreate):
 		return interactionCreateEventHandler(v)
+	case func(*Session, *InvalidAuth):
+		return invalidAuthEventHandler(v)
 	case func(*Session, *InviteCreate):
 		return inviteCreateEventHandler(v)
 	case func(*Session, *InviteDelete):

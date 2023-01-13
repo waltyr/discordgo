@@ -104,7 +104,7 @@ func constCase(name string) string {
 
 func isDiscordEvent(name string) bool {
 	switch {
-	case name == "Connect", name == "Disconnect", name == "Event", name == "RateLimit", name == "Interface":
+	case name == "Connect", name == "Disconnect", name == "InvalidAuth", name == "Event", name == "RateLimit", name == "Interface":
 		return false
 	default:
 		return true

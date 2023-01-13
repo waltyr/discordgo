@@ -17,6 +17,8 @@ type Connect struct{}
 // This is a synthetic event and is not dispatched by Discord.
 type Disconnect struct{}
 
+// InvalidAuth is the data for a InvalidAuth event.
+// This is a synthetic event and is not dispatched by Discord.
 type InvalidAuth struct{}
 
 // RateLimit is the data for a RateLimit event.
