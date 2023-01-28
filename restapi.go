@@ -1866,6 +1866,19 @@ func (s *Session) ChannelMessageSendComplex(channelID string, data *MessageSend)
 	return
 }
 
+func (s *Session) ChannelAttachmentCreate(channelID string, data *ReqPrepareAttachments) (st *RespPrepareAttachments, err error) {
+	endpoint := EndpointChannelAttachments(channelID)
+
+	var response []byte
+	response, err = s.RequestWithBucketID("POST", endpoint, data, endpoint)
+	if err != nil {
+		return
+	}
+
+	err = unmarshal(response, &st)
+	return
+}
+
 // ChannelMessageSendTTS sends a message to the given channel with Text to Speech.
 // channelID : The ID of a Channel.
 // content   : The message to send.
