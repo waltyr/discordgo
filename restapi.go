@@ -164,7 +164,11 @@ func (s *Session) RequestWithLockedBucket(method, urlStr, contentType string, b 
 		}
 	}
 
-	s.log(LogDebug, "Requesting %s %s with %s", req.Method, req.URL.String(), b)
+	logBody := b
+	if contentType != "application/json" {
+		logBody = []byte(fmt.Sprintf("%d bytes of %s", len(logBody), contentType))
+	}
+	s.log(LogDebug, "Requesting %s %s with %s", req.Method, req.URL.String(), logBody)
 	resp, err := s.Client.Do(req)
 	if err != nil {
 		bucket.Release(nil)
