@@ -14,6 +14,7 @@ package discordgo
 
 import (
 	"errors"
+	"fmt"
 	"sort"
 	"sync"
 )
@@ -175,8 +176,9 @@ func (s *State) GuildRemove(guild *Guild) error {
 
 // Guild gets a guild by ID.
 // Useful for querying if @me is in a guild:
-//     _, err := discordgo.Session.State.Guild(guildID)
-//     isInGuild := err == nil
+//
+//	_, err := discordgo.Session.State.Guild(guildID)
+//	isInGuild := err == nil
 func (s *State) Guild(guildID string) (*Guild, error) {
 	if s == nil {
 		return nil, ErrNilState
@@ -1151,16 +1153,19 @@ func (s *State) UserChannelPermissions(userID, channelID string) (apermissions i
 
 	channel, err := s.Channel(channelID)
 	if err != nil {
+		err = fmt.Errorf("channel: %w", err)
 		return
 	}
 
 	guild, err := s.Guild(channel.GuildID)
 	if err != nil {
+		err = fmt.Errorf("guild: %w", err)
 		return
 	}
 
 	member, err := s.Member(guild.ID, userID)
 	if err != nil {
+		err = fmt.Errorf("member: %w", err)
 		return
 	}
 
