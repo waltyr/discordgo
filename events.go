@@ -395,6 +395,11 @@ func (i *InteractionCreate) UnmarshalJSON(b []byte) error {
 	return json.Unmarshal(b, &i.Interaction)
 }
 
+type InteractionSuccess struct {
+	Nonce string `json:"nonce"`
+	ID    string `json:"id"`
+}
+
 // InviteCreate is the data for a InviteCreate event
 type InviteCreate struct {
 	*Invite
