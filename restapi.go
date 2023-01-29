@@ -3481,3 +3481,103 @@ func (s *Session) AutoModerationRuleDelete(guildID, ruleID string) (err error) {
 	_, err = s.RequestWithBucketID("DELETE", endpoint, nil, endpoint)
 	return
 }
+
+type cursor struct {
+	Repaired bool   `json:"repaired"`
+	Previous string `json:"previous"`
+	Next     string `json:"next"`
+}
+
+type respSearchApplicationCommands struct {
+	Applications        []*Application        `json:"applications"`
+	ApplicationCommands []*ApplicationCommand `json:"application_commands"`
+	Cursor              cursor                `json:"cursor"`
+}
+
+func (s *Session) ApplicationCommandsSearch(channelID, query string) (st []*ApplicationCommand, err error) {
+	queryParams := url.Values{
+		"type":                 {"1"},
+		"query":                {query},
+		"limit":                {"7"},
+		"include_applications": {"false"},
+	}
+	if query == "" {
+		queryParams.Set("limit", "10")
+		queryParams.Set("include_applications", "true")
+		queryParams.Del("query")
+	}
+	endpoint := EndpointApplicationCommandsSearch(channelID) + "?" + queryParams.Encode()
+
+	var body []byte
+	body, err = s.RequestWithBucketID("GET", endpoint, nil, endpoint)
+	if err != nil {
+		return
+	}
+
+	var resp respSearchApplicationCommands
+	err = unmarshal(body, &resp)
+	st = resp.ApplicationCommands
+	return
+}
+
+type ApplicationCommandOptionInput struct {
+	Type    ApplicationCommandOptionType     `json:"type"`
+	Name    string                           `json:"name"`
+	Value   interface{}                      `json:"value,omitempty"`
+	Options []*ApplicationCommandOptionInput `json:"options,omitempty"`
+}
+
+type interactionData struct {
+	Version       string                 `json:"version"`
+	ID            string                 `json:"id"`
+	ApplicationID string                 `json:"application_id"`
+	Name          string                 `json:"name"`
+	Type          ApplicationCommandType `json:"type"`
+
+	Options     []*ApplicationCommandOptionInput `json:"options"`
+	Attachments []interface{}                    `json:"attachments"`
+
+	ApplicationCommand *ApplicationCommand `json:"application_command"`
+}
+
+type reqSendInteraction struct {
+	Type          int             `json:"type"`
+	ApplicationID string          `json:"application_id"`
+	GuildID       string          `json:"guild_id,omitempty"`
+	ChannelID     string          `json:"channel_id"`
+	SessionID     string          `json:"session_id"`
+	Data          interactionData `json:"data"`
+	Nonce         string          `json:"nonce"`
+}
+
+func (s *Session) SendInteractions(guildID, channelID string, cmd *ApplicationCommand, options []*ApplicationCommandOptionInput, nonce string) error {
+	if options == nil {
+		options = make([]*ApplicationCommandOptionInput, 0)
+	}
+	req := &reqSendInteraction{
+		Type:          2,
+		ApplicationID: cmd.ApplicationID,
+		GuildID:       guildID,
+		ChannelID:     channelID,
+		SessionID:     s.sessionID,
+		Data: interactionData{
+			Version:            cmd.Version,
+			ApplicationID:      cmd.ApplicationID,
+			ID:                 cmd.ID,
+			Name:               cmd.Name,
+			Type:               cmd.Type,
+			Options:            options,
+			Attachments:        []interface{}{},
+			ApplicationCommand: cmd,
+		},
+		Nonce: nonce,
+	}
+	contentType, body, encodeErr := MultipartBodyWithJSON(req, nil)
+	if encodeErr != nil {
+		return encodeErr
+	}
+
+	endpoint := EndpointInteractions
+	_, err := s.request("POST", endpoint, contentType, body, endpoint, 0)
+	return err
+}

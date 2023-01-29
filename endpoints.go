@@ -261,4 +261,7 @@ var (
 	EndpointSso          = EndpointAPI + "sso"
 	EndpointReport       = EndpointAPI + "report"
 	EndpointIntegrations = EndpointAPI + "integrations"
+	EndpointInteractions = EndpointAPI + "interactions"
+
+	EndpointApplicationCommandsSearch = func(cID string) string { return EndpointChannel(cID) + "/application-commands/search" }
 )

@@ -163,6 +163,8 @@ type Application struct {
 	Slug                string   `json:"slug"`
 	CoverImage          string   `json:"cover_image"`
 	Flags               int      `json:"flags,omitempty"`
+
+	Bot *User `json:"bot,omitempty"`
 }
 
 // UserConnection is a Connection returned from the UserConnections endpoint
