@@ -472,7 +472,7 @@ type markViewingOp struct {
 
 type GuildSubscribeData struct {
 	GuildID           string             `json:"guild_id"`
-	Channels          map[string][][]int `json:"channels"`
+	Channels          map[string][][]int `json:"channels,omitempty"`
 	Typing            bool               `json:"typing,omitempty"`
 	Activities        bool               `json:"activities,omitempty"`
 	Threads           bool               `json:"threads,omitempty"`
