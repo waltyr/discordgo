@@ -232,11 +232,51 @@ func setPrivateChannelMembers(r *Ready) {
 	}
 }
 
+func copyGuildProperties(g *Guild) {
+	if g.Properties == nil {
+		return
+	}
+	g.AfkChannelID = g.Properties.AfkChannelID
+	g.AfkTimeout = g.Properties.AfkTimeout
+	g.ApplicationID = g.Properties.ApplicationID
+	g.Banner = g.Properties.Banner
+	g.DefaultMessageNotifications = g.Properties.DefaultMessageNotifications
+	g.Description = g.Properties.Description
+	g.DiscoverySplash = g.Properties.DiscoverySplash
+	g.ExplicitContentFilter = g.Properties.ExplicitContentFilter
+	g.Features = g.Properties.Features
+	//g.HomeHeader = g.Properties.HomeHeader
+	//g.HubType = g.Properties.HubType
+	g.Icon = g.Properties.Icon
+	//g.LatestOnboardingQuestionID = g.Properties.LatestOnboardingQuestionID
+	g.MaxMembers = g.Properties.MaxMembers
+	//g.MaxStageVideoChannelUsers = g.Properties.MaxStageVideoChannelUsers
+	g.MaxVideoChannelUsers = g.Properties.MaxVideoChannelUsers
+	g.MfaLevel = g.Properties.MfaLevel
+	g.Name = g.Properties.Name
+	//g.NSFW = g.Properties.NSFW
+	g.NSFWLevel = g.Properties.NSFWLevel
+	g.OwnerID = g.Properties.OwnerID
+	g.PreferredLocale = g.Properties.PreferredLocale
+	//g.PremiumProgressBarEnabled = g.Properties.PremiumProgressBarEnabled
+	g.PremiumTier = g.Properties.PremiumTier
+	g.PublicUpdatesChannelID = g.Properties.PublicUpdatesChannelID
+	g.RulesChannelID = g.Properties.RulesChannelID
+	//g.SafetyAlertsChannelID = g.Properties.SafetyAlertsChannelID
+	g.Splash = g.Properties.Splash
+	g.SystemChannelFlags = g.Properties.SystemChannelFlags
+	g.SystemChannelID = g.Properties.SystemChannelID
+	g.VanityURLCode = g.Properties.VanityURLCode
+	g.VerificationLevel = g.Properties.VerificationLevel
+	g.Properties = nil
+}
+
 // onInterface handles all internal events and routes them to the appropriate internal handler.
 func (s *Session) onInterface(i interface{}) {
 	switch t := i.(type) {
 	case *Ready:
 		for _, g := range t.Guilds {
+			copyGuildProperties(g)
 			setGuildIds(g)
 		}
 		setPrivateChannelMembers(t)

@@ -787,6 +787,8 @@ type Guild struct {
 
 	// Stage instances in the guild
 	StageInstances []*StageInstance `json:"stage_instances"`
+
+	Properties *Guild `json:"properties,omitempty"`
 }
 
 // A GuildPreview holds data related to a specific public Discord Guild, even if the user is not in the guild.
