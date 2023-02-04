@@ -3,25 +3,27 @@ package discordgo
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"net/url"
 )
 
 const (
-	droidCapabilities      = 1021
+	droidCapabilities      = 4093
 	droidOS                = "Windows"
 	droidOSVersion         = "10"
 	droidBrowser           = "Chrome"
 	droidReferrer          = "https://discord.com/channels/@me"
 	droidReferringDomain   = "discord.com"
-	droidClientBuildNumber = "146284"
+	droidClientBuildNumber = "171842"
 	droidReleaseChannel    = "stable"
 	droidStatus            = "online"
 	droidSystemLocale      = "en-US"
 )
 
 const (
-	DroidBrowserVersion   = "105.0.0.0"
-	DroidBrowserUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/" + DroidBrowserVersion + " Safari/537.36"
+	DroidBrowserMajorVersion = "109"
+	DroidBrowserVersion      = DroidBrowserMajorVersion + ".0.0.0"
+	DroidBrowserUserAgent    = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/" + DroidBrowserVersion + " Safari/537.36"
 )
 
 type UserIdentifyProperties struct {
@@ -81,7 +83,7 @@ var (
 		SystemLocale:      droidSystemLocale,
 	}
 	DroidFetchHeaders = map[string]string{
-		"Sec-CH-UA":          `" Not A;Brand";v="99", "Chromium";v="103", "Google Chrome";v="103"`,
+		"Sec-CH-UA":          fmt.Sprintf(`" Not A;Brand";v="99", "Chromium";v="%[1]s", "Google Chrome";v="%[1]s"`, DroidBrowserMajorVersion),
 		"Sec-CH-UA-Mobile":   "?0",
 		"Sec-CH-UA-Platform": droidOS,
 		"Sec-Fetch-Dest":     "empty",
