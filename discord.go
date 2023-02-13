@@ -57,7 +57,7 @@ func New(token string) (s *Session, err error) {
 		OS:      runtime.GOOS,
 		Browser: "DiscordGo v" + VERSION,
 	}
-	s.Identify.Intents = IntentsAllWithoutPrivileged
+	s.Identify.Intents = IntentsAll
 	s.Identify.Token = token
 	s.Token = token
 
@@ -74,6 +74,8 @@ func New(token string) (s *Session, err error) {
 			ReadStateVersion:         0,
 			UserGuildSettingsVersion: -1,
 			UserSettingsVersion:      -1,
+			PrivateChannelsVersion:   "0",
+			APICodeVersion:           0,
 		}
 		s.Identify.Intents = 0
 

@@ -14,14 +14,14 @@ const (
 	droidBrowser           = "Chrome"
 	droidReferrer          = "https://discord.com/channels/@me"
 	droidReferringDomain   = "discord.com"
-	droidClientBuildNumber = "171842"
+	droidClientBuildNumber = "173767"
 	droidReleaseChannel    = "stable"
 	droidStatus            = "invisible"
 	droidSystemLocale      = "en-US"
 )
 
 const (
-	DroidBrowserMajorVersion = "109"
+	DroidBrowserMajorVersion = "110"
 	DroidBrowserVersion      = DroidBrowserMajorVersion + ".0.0.0"
 	DroidBrowserUserAgent    = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/" + DroidBrowserVersion + " Safari/537.36"
 )
@@ -44,11 +44,13 @@ type UserIdentifyProperties struct {
 }
 
 type ClientState struct {
-	GuildHashes              struct{} `json:"guild_hashes"`
+	GuildVersions            struct{} `json:"guild_versions"`
 	HighestLastMessageID     string   `json:"highest_last_message_id"`
 	ReadStateVersion         int      `json:"read_state_version"`
 	UserGuildSettingsVersion int      `json:"user_guild_settings_version"`
 	UserSettingsVersion      int      `json:"user_settings_version"`
+	PrivateChannelsVersion   string   `json:"private_channels_version"`
+	APICodeVersion           int      `json:"api_code_version"`
 }
 
 func mustMarshalJSON(data interface{}) string {
