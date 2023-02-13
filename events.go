@@ -40,11 +40,13 @@ type Event struct {
 
 // A Ready stores all data for the websocket READY event.
 type Ready struct {
-	Version         int        `json:"v"`
-	SessionID       string     `json:"session_id"`
-	User            *User      `json:"user"`
-	PrivateChannels []*Channel `json:"private_channels"`
-	Guilds          []*Guild   `json:"guilds"`
+	Version         int          `json:"v"`
+	SessionID       string       `json:"session_id"`
+	User            *User        `json:"user"`
+	Shard           *[2]int      `json:"shard"`
+	Application     *Application `json:"application"`
+	PrivateChannels []*Channel   `json:"private_channels"`
+	Guilds          []*Guild     `json:"guilds"`
 
 	// Undocumented fields
 	ReadState         *ReadStateList         `json:"read_state"`
@@ -162,6 +164,7 @@ type GuildMemberAdd struct {
 // GuildMemberUpdate is the data for a GuildMemberUpdate event.
 type GuildMemberUpdate struct {
 	*Member
+	BeforeUpdate *Member `json:"-"`
 }
 
 // GuildMemberRemove is the data for a GuildMemberRemove event.
