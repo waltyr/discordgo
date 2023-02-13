@@ -274,8 +274,8 @@ type RespPrepareAttachments struct {
 // is also where you should get the instance from.
 type MessageEdit struct {
 	Content         *string                 `json:"content,omitempty"`
-	Components      []MessageComponent      `json:"components"`
-	Embeds          []*MessageEmbed         `json:"embeds"`
+	Components      []MessageComponent      `json:"components,omitempty"`
+	Embeds          []*MessageEmbed         `json:"embeds,omitempty"`
 	AllowedMentions *MessageAllowedMentions `json:"allowed_mentions,omitempty"`
 	Flags           MessageFlags            `json:"flags,omitempty"`
 	// Files to append to the message
@@ -283,8 +283,8 @@ type MessageEdit struct {
 	// Overwrite existing attachments
 	Attachments *[]*MessageAttachment `json:"attachments,omitempty"`
 
-	ID      string
-	Channel string
+	ID      string `json:"-"`
+	Channel string `json:"-"`
 
 	// TODO: Remove this when compatibility is not required.
 	Embed *MessageEmbed `json:"-"`
