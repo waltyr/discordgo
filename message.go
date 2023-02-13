@@ -228,10 +228,10 @@ type File struct {
 type MessageSend struct {
 	Nonce string `json:"nonce,omitempty"`
 
-	Content         string                  `json:"content,omitempty"`
-	Embeds          []*MessageEmbed         `json:"embeds"`
+	Content         string                  `json:"content"`
+	Embeds          []*MessageEmbed         `json:"embeds,omitempty"`
 	TTS             bool                    `json:"tts"`
-	Components      []MessageComponent      `json:"components"`
+	Components      []MessageComponent      `json:"components,omitempty"`
 	Files           []*File                 `json:"-"`
 	AllowedMentions *MessageAllowedMentions `json:"allowed_mentions,omitempty"`
 	Reference       *MessageReference       `json:"message_reference,omitempty"`
@@ -243,6 +243,11 @@ type MessageSend struct {
 
 	// TODO: Remove this when compatibility is not required.
 	Embed *MessageEmbed `json:"-"`
+
+	StickerIDs []string `json:"sticker_ids,omitempty"`
+
+	Flags *int `json:"flags,omitempty"`
+	Type  *int `json:"type,omitempty"`
 }
 
 type FilePrepare struct {

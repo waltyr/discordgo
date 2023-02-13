@@ -1933,6 +1933,14 @@ func (s *Session) ChannelMessageSendComplex(channelID string, data *MessageSend,
 
 		response, err = s.request("POST", endpoint, contentType, body, endpoint, 0, options...)
 	} else {
+		if s.IsUser {
+			zero := 0
+			if data.Attachments != nil {
+				data.Type = &zero
+			} else {
+				data.Flags = &zero
+			}
+		}
 		response, err = s.RequestWithBucketID("POST", endpoint, data, endpoint, options...)
 	}
 	if err != nil {
