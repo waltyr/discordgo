@@ -16,7 +16,7 @@ const (
 	droidReferringDomain   = "discord.com"
 	droidClientBuildNumber = "171842"
 	droidReleaseChannel    = "stable"
-	droidStatus            = "online"
+	droidStatus            = "invisible"
 	droidSystemLocale      = "en-US"
 )
 

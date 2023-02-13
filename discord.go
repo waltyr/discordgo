@@ -66,6 +66,7 @@ func New(token string) (s *Session, err error) {
 		s.Identify.Compress = false
 		s.Identify.LargeThreshold = 0
 		s.Identify.Presence.Status = droidStatus
+		s.Identify.Presence.AFK = true
 		s.Identify.Properties = droidIdentifyProperties
 		s.Identify.Capabilities = droidCapabilities
 		s.Identify.ClientState = &ClientState{
