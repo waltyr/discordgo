@@ -14,7 +14,7 @@ const (
 	droidBrowser           = "Chrome"
 	droidReferrer          = "https://discord.com/channels/@me"
 	droidReferringDomain   = "discord.com"
-	droidClientBuildNumber = "173767"
+	droidClientBuildNumber = "174051"
 	droidReleaseChannel    = "stable"
 	droidStatus            = "invisible"
 	droidSystemLocale      = "en-US"
