@@ -2044,8 +2044,6 @@ type MessageReaction struct {
 	Emoji     Emoji  `json:"emoji"`
 	ChannelID string `json:"channel_id"`
 	GuildID   string `json:"guild_id,omitempty"`
-
-	Member *Member `json:"member,omitempty"`
 }
 
 // GatewayBotResponse stores the data for the gateway/bot response
