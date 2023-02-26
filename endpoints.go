@@ -149,6 +149,8 @@ var (
 			ext = ".png"
 		case StickerFormatTypeLottie:
 			ext = ".json"
+		case StickerFormatTypeGIF:
+			ext = ".gif"
 		}
 		return EndpointCDNStickers + sID + ext
 	}
