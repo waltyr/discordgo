@@ -61,7 +61,7 @@ func New(token string) (s *Session, err error) {
 	s.Identify.Token = token
 	s.Token = token
 
-	if !strings.HasPrefix(token, "Bot ") {
+	if token != "" && !strings.HasPrefix(token, "Bot ") {
 		s.Identify.Presence.Activities = make([]Activity, 0)
 		s.Identify.Compress = false
 		s.Identify.LargeThreshold = 0
