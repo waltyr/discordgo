@@ -574,6 +574,10 @@ func (s *Session) requestGuildMembers(data requestGuildMembersData) (err error) 
 }
 
 func (s *Session) MarkViewing(channelID string) (err error) {
+	if !s.IsUser {
+		s.log(LogWarning, "ignoring call")
+		return
+	}
 	s.log(LogInformational, "called")
 
 	s.RLock()
@@ -590,6 +594,10 @@ func (s *Session) MarkViewing(channelID string) (err error) {
 }
 
 func (s *Session) SubscribeGuild(dat GuildSubscribeData) (err error) {
+	if !s.IsUser {
+		s.log(LogWarning, "ignoring call")
+		return
+	}
 	s.log(LogInformational, "called")
 
 	s.RLock()
