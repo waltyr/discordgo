@@ -282,8 +282,10 @@ func (s *Session) onInterface(i interface{}) {
 		setPrivateChannelMembers(t)
 		s.onReady(t)
 	case *GuildCreate:
+		copyGuildProperties(t.Guild)
 		setGuildIds(t.Guild)
 	case *GuildUpdate:
+		copyGuildProperties(t.Guild)
 		setGuildIds(t.Guild)
 	case *VoiceServerUpdate:
 		go s.onVoiceServerUpdate(t)
