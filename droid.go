@@ -14,7 +14,7 @@ const (
 	droidBrowser           = "Chrome"
 	droidReferrer          = "https://discord.com/channels/@me"
 	droidReferringDomain   = "discord.com"
-	droidClientBuildNumber = "174051"
+	droidClientBuildNumber = "177662"
 	droidReleaseChannel    = "stable"
 	droidStatus            = "invisible"
 	droidSystemLocale      = "en-US"
@@ -41,6 +41,7 @@ type UserIdentifyProperties struct {
 	ReleaseChannel         string  `json:"release_channel"`
 	ClientBuildNumber      string  `json:"client_build_number"`
 	ClientEventSource      *string `json:"client_event_source"`
+	DesignID               int     `json:"design_id"`
 }
 
 type ClientState struct {
@@ -83,6 +84,7 @@ var (
 		ClientBuildNumber: droidClientBuildNumber,
 		ReleaseChannel:    droidReleaseChannel,
 		SystemLocale:      droidSystemLocale,
+		DesignID:          0,
 	}
 	DroidFetchHeaders = map[string]string{
 		"Sec-CH-UA":          fmt.Sprintf(`" Not A;Brand";v="99", "Chromium";v="%[1]s", "Google Chrome";v="%[1]s"`, DroidBrowserMajorVersion),
