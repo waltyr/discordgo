@@ -373,6 +373,9 @@ type MessageAttachment struct {
 	Ephemeral   bool   `json:"ephemeral,omitempty"`
 
 	UploadedFilename string `json:"uploaded_filename"`
+
+	Waveform        []byte  `json:"waveform,omitempty"`
+	DurationSeconds float64 `json:"duration_secs,omitempty"`
 }
 
 // MessageEmbedFooter is a part of a MessageEmbed struct.
