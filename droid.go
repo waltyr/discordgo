@@ -8,20 +8,20 @@ import (
 )
 
 const (
-	droidCapabilities      = 4093
+	droidCapabilities      = 8189
 	droidOS                = "Windows"
 	droidOSVersion         = "10"
 	droidBrowser           = "Chrome"
 	droidReferrer          = "https://discord.com/channels/@me"
 	droidReferringDomain   = "discord.com"
-	droidClientBuildNumber = "177662"
+	droidClientBuildNumber = "189617"
 	droidReleaseChannel    = "stable"
 	droidStatus            = "invisible"
 	droidSystemLocale      = "en-US"
 )
 
 const (
-	DroidBrowserMajorVersion = "110"
+	DroidBrowserMajorVersion = "112"
 	DroidBrowserVersion      = DroidBrowserMajorVersion + ".0.0.0"
 	DroidBrowserUserAgent    = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/" + DroidBrowserVersion + " Safari/537.36"
 )
