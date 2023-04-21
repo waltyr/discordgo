@@ -1475,11 +1475,20 @@ type FriendSourceFlags struct {
 	MutualFriends bool `json:"mutual_friends"`
 }
 
+type RelationshipType int
+
+const (
+	RelationshipFriend                RelationshipType = 1
+	RelationshipBlocked               RelationshipType = 2
+	RelationshipIncomingFriendRequest RelationshipType = 3
+	RelationshipOutgoingFriendRequest RelationshipType = 4
+)
+
 // A Relationship between the logged in user and Relationship.User
 type Relationship struct {
-	User *User  `json:"user"`
-	Type int    `json:"type"` // 1 = friend, 2 = blocked, 3 = incoming friend req, 4 = sent friend req
-	ID   string `json:"id"`
+	Type     RelationshipType `json:"type"`
+	ID       string           `json:"id"`
+	Nickname string           `json:"nickname,omitempty"`
 }
 
 // A TooManyRequests struct holds information received from Discord

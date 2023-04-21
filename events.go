@@ -334,6 +334,11 @@ type RelationshipRemove struct {
 	*Relationship
 }
 
+// RelationshipUpdate is the data for a RelationshipUpdate event.
+type RelationshipUpdate struct {
+	*Relationship
+}
+
 // TypingStart is the data for a TypingStart event.
 type TypingStart struct {
 	UserID    string `json:"user_id"`
