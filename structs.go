@@ -2032,10 +2032,21 @@ type GuildMemberAddParams struct {
 	Deaf bool `json:"deaf,omitempty"`
 }
 
+type FormFieldError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+type FormFieldErrors struct {
+	Errors []FormFieldError `json:"_errors"`
+}
+
 // An APIErrorMessage is an api error message returned from discord
 type APIErrorMessage struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
+
+	Errors map[string]FormFieldErrors `json:"errors"`
 }
 
 // MessageReaction stores the data for a message reaction.
