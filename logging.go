@@ -74,6 +74,11 @@ func (s *Session) log(msgL int, format string, a ...interface{}) {
 		return
 	}
 
+	if s.Logger != nil {
+		s.Logger(msgL, 1, format, a...)
+		return
+	}
+
 	msglog(msgL, 2, format, a...)
 }
 

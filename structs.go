@@ -140,6 +140,8 @@ type Session struct {
 	wsMutex sync.Mutex
 
 	IsUser bool
+
+	Logger func(msgL, caller int, format string, a ...interface{})
 }
 
 // Application stores values for a Discord Application
