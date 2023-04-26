@@ -116,6 +116,8 @@ type Session struct {
 	handlers     map[string][]*eventHandlerInstance
 	onceHandlers map[string][]*eventHandlerInstance
 
+	EventHandler func(any)
+
 	// The websocket connection.
 	wsConn *websocket.Conn
 

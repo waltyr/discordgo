@@ -187,17 +187,19 @@ func (s *Session) handle(t string, i interface{}) {
 // Handles an event type by calling internal methods, firing handlers and firing the
 // interface{} event.
 func (s *Session) handleEvent(t string, i interface{}) {
-	s.handlersMu.RLock()
-	defer s.handlersMu.RUnlock()
+	//s.handlersMu.RLock()
+	//defer s.handlersMu.RUnlock()
 
 	// All events are dispatched internally first.
 	s.onInterface(i)
 
+	s.EventHandler(i)
+
 	// Then they are dispatched to anyone handling interface{} events.
-	s.handle(interfaceEventType, i)
+	//s.handle(interfaceEventType, i)
 
 	// Finally they are dispatched to any typed handlers.
-	s.handle(t, i)
+	//s.handle(t, i)
 }
 
 // setGuildIds will set the GuildID on all the members of a guild.
