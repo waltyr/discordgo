@@ -339,6 +339,16 @@ type RelationshipUpdate struct {
 	*Relationship
 }
 
+type ChannelRecipientRemove struct {
+	ChannelID string `json:"channel_id"`
+	User      *User  `json:"user"`
+}
+
+type ChannelRecipientAdd struct {
+	ChannelID string `json:"channel_id"`
+	User      *User  `json:"user"`
+}
+
 // TypingStart is the data for a TypingStart event.
 type TypingStart struct {
 	UserID    string `json:"user_id"`
