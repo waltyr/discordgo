@@ -455,6 +455,8 @@ type Channel struct {
 	// The default forum layout view used to display posts in forum channels.
 	// Defaults to ForumLayoutNotSet, which indicates a layout view has not been set by a channel admin.
 	DefaultForumLayout ForumLayout `json:"default_forum_layout"`
+
+	MemberIDsPreview []string `json:"member_ids_preview"`
 }
 
 // Mention returns a string which mentions the channel
