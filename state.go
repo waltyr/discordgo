@@ -951,11 +951,13 @@ func (s *State) onReady(se *Session, r *Ready) (err error) {
 		s.guildMap[g.ID] = g
 		memberMap := s.createMemberMap(g)
 
-		for _, member := range r.MergedMembers[i] {
-			member.User = findUser(member.UserID)
-			member.GuildID = g.ID
-			if member.User != nil {
-				memberMap[member.User.ID] = member
+		if len(r.MergedMembers) == len(r.Guilds) {
+			for _, member := range r.MergedMembers[i] {
+				member.User = findUser(member.UserID)
+				member.GuildID = g.ID
+				if member.User != nil {
+					memberMap[member.User.ID] = member
+				}
 			}
 		}
 
