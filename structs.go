@@ -753,6 +753,11 @@ const (
 	PremiumTier3    PremiumTier = 3
 )
 
+type MinimalGuild struct {
+	ID string `json:"id"`
+	// Also has voice_states and embedded_activities
+}
+
 // A Guild holds all data related to a specific Discord Guild.  Guilds are also
 // sometimes referred to as Servers in the Discord client.
 type Guild struct {
@@ -1380,6 +1385,9 @@ type Assets struct {
 type Member struct {
 	// The guild ID on which the member exists.
 	GuildID string `json:"guild_id"`
+
+	// The user ID of the member, probably only in MergedMembers.
+	UserID string `json:"user_id"`
 
 	// The time at which the member joined the guild.
 	JoinedAt time.Time `json:"joined_at"`

@@ -57,6 +57,7 @@ const (
 	presencesReplaceEventType                    = "PRESENCES_REPLACE"
 	rateLimitEventType                           = "__RATE_LIMIT__"
 	readyEventType                               = "READY"
+	readySupplementalEventType                   = "READY_SUPPLEMENTAL"
 	relationshipAddEventType                     = "RELATIONSHIP_ADD"
 	relationshipRemoveEventType                  = "RELATIONSHIP_REMOVE"
 	relationshipUpdateEventType                  = "RELATIONSHIP_UPDATE"
@@ -1055,6 +1056,26 @@ func (eh readyEventHandler) Handle(s *Session, i interface{}) {
 	}
 }
 
+// readySupplementalEventHandler is an event handler for ReadySupplemental events.
+type readySupplementalEventHandler func(*Session, *ReadySupplemental)
+
+// Type returns the event type for ReadySupplemental events.
+func (eh readySupplementalEventHandler) Type() string {
+	return readySupplementalEventType
+}
+
+// New returns a new instance of ReadySupplemental.
+func (eh readySupplementalEventHandler) New() interface{} {
+	return &ReadySupplemental{}
+}
+
+// Handle is the handler for ReadySupplemental events.
+func (eh readySupplementalEventHandler) Handle(s *Session, i interface{}) {
+	if t, ok := i.(*ReadySupplemental); ok {
+		eh(s, t)
+	}
+}
+
 // relationshipAddEventHandler is an event handler for RelationshipAdd events.
 type relationshipAddEventHandler func(*Session, *RelationshipAdd)
 
@@ -1579,6 +1600,8 @@ func handlerForInterface(handler interface{}) EventHandler {
 		return rateLimitEventHandler(v)
 	case func(*Session, *Ready):
 		return readyEventHandler(v)
+	case func(*Session, *ReadySupplemental):
+		return readySupplementalEventHandler(v)
 	case func(*Session, *RelationshipAdd):
 		return relationshipAddEventHandler(v)
 	case func(*Session, *RelationshipRemove):
@@ -1672,6 +1695,7 @@ func init() {
 	registerInterfaceProvider(presenceUpdateEventHandler(nil))
 	registerInterfaceProvider(presencesReplaceEventHandler(nil))
 	registerInterfaceProvider(readyEventHandler(nil))
+	registerInterfaceProvider(readySupplementalEventHandler(nil))
 	registerInterfaceProvider(relationshipAddEventHandler(nil))
 	registerInterfaceProvider(relationshipRemoveEventHandler(nil))
 	registerInterfaceProvider(relationshipUpdateEventHandler(nil))

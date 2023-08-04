@@ -75,12 +75,13 @@ func NewState() *State {
 	}
 }
 
-func (s *State) createMemberMap(guild *Guild) {
+func (s *State) createMemberMap(guild *Guild) map[string]*Member {
 	members := make(map[string]*Member)
 	for _, m := range guild.Members {
 		members[m.User.ID] = m
 	}
 	s.memberMap[guild.ID] = members
+	return members
 }
 
 // GuildAdd adds a guild to the current world state, or
@@ -934,9 +935,29 @@ func (s *State) onReady(se *Session, r *Ready) (err error) {
 
 	s.Ready = *r
 
-	for _, g := range s.Guilds {
+	findUser := func(userID string) *User {
+		if userID == r.User.ID {
+			return r.User
+		}
+		for _, user := range r.Users {
+			if user.ID == userID {
+				return user
+			}
+		}
+		return nil
+	}
+
+	for i, g := range s.Guilds {
 		s.guildMap[g.ID] = g
-		s.createMemberMap(g)
+		memberMap := s.createMemberMap(g)
+
+		for _, member := range r.MergedMembers[i] {
+			member.User = findUser(member.UserID)
+			member.GuildID = g.ID
+			if member.User != nil {
+				memberMap[member.User.ID] = member
+			}
+		}
 
 		for _, c := range g.Channels {
 			s.channelMap[c.ID] = c
