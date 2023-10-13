@@ -44,6 +44,9 @@ type Session struct {
 	// Should the session reconnect the websocket on errors.
 	ShouldReconnectOnError bool
 
+	// Should voice connections reconnect on a session reconnect.
+	ShouldReconnectVoiceOnSessionError bool
+
 	// Should the session retry requests when rate limited.
 	ShouldRetryOnRateLimit bool
 
@@ -474,7 +477,7 @@ type ChannelEdit struct {
 	Name                          string                 `json:"name,omitempty"`
 	Topic                         string                 `json:"topic,omitempty"`
 	NSFW                          *bool                  `json:"nsfw,omitempty"`
-	Position                      int                    `json:"position"`
+	Position                      *int                   `json:"position,omitempty"`
 	Bitrate                       int                    `json:"bitrate,omitempty"`
 	UserLimit                     int                    `json:"user_limit,omitempty"`
 	PermissionOverwrites          []*PermissionOverwrite `json:"permission_overwrites,omitempty"`
@@ -563,7 +566,7 @@ type ThreadMember struct {
 	// The time the current user last joined the thread
 	JoinTimestamp time.Time `json:"join_timestamp"`
 	// Any user-thread settings, currently only used for notifications
-	Flags int
+	Flags int `json:"flags"`
 }
 
 // ThreadsList represents a list of threads alongisde with thread member objects for the current user.
@@ -1864,14 +1867,18 @@ const (
 // AuditLogOptions optional data for the AuditLog
 // https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-optional-audit-entry-info
 type AuditLogOptions struct {
-	DeleteMemberDays string               `json:"delete_member_days"`
-	MembersRemoved   string               `json:"members_removed"`
-	ChannelID        string               `json:"channel_id"`
-	MessageID        string               `json:"message_id"`
-	Count            string               `json:"count"`
-	ID               string               `json:"id"`
-	Type             *AuditLogOptionsType `json:"type"`
-	RoleName         string               `json:"role_name"`
+	DeleteMemberDays              string               `json:"delete_member_days"`
+	MembersRemoved                string               `json:"members_removed"`
+	ChannelID                     string               `json:"channel_id"`
+	MessageID                     string               `json:"message_id"`
+	Count                         string               `json:"count"`
+	ID                            string               `json:"id"`
+	Type                          *AuditLogOptionsType `json:"type"`
+	RoleName                      string               `json:"role_name"`
+	ApplicationID                 string               `json:"application_id"`
+	AutoModerationRuleName        string               `json:"auto_moderation_rule_name"`
+	AutoModerationRuleTriggerType string               `json:"auto_moderation_rule_trigger_type"`
+	IntegrationType               string               `json:"integration_type"`
 }
 
 // AuditLogOptionsType of the AuditLogOption
@@ -1880,8 +1887,8 @@ type AuditLogOptionsType string
 
 // Valid Types for AuditLogOptionsType
 const (
-	AuditLogOptionsTypeMember AuditLogOptionsType = "member"
-	AuditLogOptionsTypeRole   AuditLogOptionsType = "role"
+	AuditLogOptionsTypeRole   AuditLogOptionsType = "0"
+	AuditLogOptionsTypeMember AuditLogOptionsType = "1"
 )
 
 // AuditLogAction is the Action of the AuditLog (see AuditLogAction* consts)
@@ -1942,7 +1949,7 @@ const (
 	AuditLogActionStickerDelete AuditLogAction = 92
 
 	AuditLogGuildScheduledEventCreate AuditLogAction = 100
-	AuditLogGuildScheduledEventUpdare AuditLogAction = 101
+	AuditLogGuildScheduledEventUpdate AuditLogAction = 101
 	AuditLogGuildScheduledEventDelete AuditLogAction = 102
 
 	AuditLogActionThreadCreate AuditLogAction = 110
@@ -1950,6 +1957,16 @@ const (
 	AuditLogActionThreadDelete AuditLogAction = 112
 
 	AuditLogActionApplicationCommandPermissionUpdate AuditLogAction = 121
+
+	AuditLogActionAutoModerationRuleCreate                AuditLogAction = 140
+	AuditLogActionAutoModerationRuleUpdate                AuditLogAction = 141
+	AuditLogActionAutoModerationRuleDelete                AuditLogAction = 142
+	AuditLogActionAutoModerationBlockMessage              AuditLogAction = 143
+	AuditLogActionAutoModerationFlagToChannel             AuditLogAction = 144
+	AuditLogActionAutoModerationUserCommunicationDisabled AuditLogAction = 145
+
+	AuditLogActionCreatorMonetizationRequestCreated AuditLogAction = 150
+	AuditLogActionCreatorMonetizationTermsAccepted  AuditLogAction = 151
 )
 
 // A UserGuildSettingsChannelOverride stores data for a channel override for a users guild settings.
@@ -2524,7 +2541,7 @@ type Intent int
 const (
 	IntentGuilds                      Intent = 1 << 0
 	IntentGuildMembers                Intent = 1 << 1
-	IntentGuildBans                   Intent = 1 << 2
+	IntentGuildModeration             Intent = 1 << 2
 	IntentGuildEmojis                 Intent = 1 << 3
 	IntentGuildIntegrations           Intent = 1 << 4
 	IntentGuildWebhooks               Intent = 1 << 5
@@ -2543,6 +2560,8 @@ const (
 	IntentAutoModerationExecution     Intent = 1 << 21
 
 	// TODO: remove when compatibility is not needed
+
+	IntentGuildBans Intent = IntentGuildModeration
 
 	IntentsGuilds                 Intent = 1 << 0
 	IntentsGuildMembers           Intent = 1 << 1
