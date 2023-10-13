@@ -129,7 +129,7 @@ func (s *Session) Open() error {
 	if err != nil {
 		return err
 	}
-	e, err := s.onEvent(mt, m)
+	e, err := s.onEvent(mt, m, true)
 	if err != nil {
 		return err
 	}
@@ -196,7 +196,7 @@ func (s *Session) Open() error {
 	if err != nil {
 		return err
 	}
-	e, err = s.onEvent(mt, m)
+	e, err = s.onEvent(mt, m, true)
 	if err != nil {
 		return err
 	}
@@ -285,7 +285,7 @@ func (s *Session) listen(wsConn *websocket.Conn, listening <-chan interface{}) {
 			return
 
 		default:
-			s.onEvent(messageType, message)
+			s.onEvent(messageType, message, false)
 
 		}
 	}
@@ -621,7 +621,7 @@ func (s *Session) SubscribeGuild(dat GuildSubscribeData) (err error) {
 //
 // If you use the AddHandler() function to register a handler for the
 // "OnEvent" event then all events will be passed to that handler.
-func (s *Session) onEvent(messageType int, message []byte) (*Event, error) {
+func (s *Session) onEvent(messageType int, message []byte, isOnConnect bool) (*Event, error) {
 	var err error
 
 	// Decode the event into an Event struct.
@@ -677,10 +677,15 @@ func (s *Session) onEvent(messageType int, message []byte) (*Event, error) {
 	// Reconnect
 	// Must immediately disconnect from gateway and reconnect to new gateway.
 	if e.Operation == 7 {
-		s.log(LogInformational, "Closing and reconnecting in response to Op7")
-		s.CloseWithCode(websocket.CloseServiceRestart)
-		s.reconnect()
-		return e, nil
+		if isOnConnect {
+			s.log(LogInformational, "Got Op7 in connect handler, returning error")
+			return e, ErrImmediateDisconnect
+		} else {
+			s.log(LogInformational, "Closing and reconnecting in response to Op7")
+			s.CloseWithCode(websocket.CloseServiceRestart)
+			s.reconnect()
+			return e, nil
+		}
 	}
 
 	// Invalid Session
