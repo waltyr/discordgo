@@ -241,8 +241,8 @@ type MessageSend struct {
 	Files           []*File                 `json:"-"`
 	AllowedMentions *MessageAllowedMentions `json:"allowed_mentions,omitempty"`
 	Reference       *MessageReference       `json:"message_reference,omitempty"`
-	StickerIDs      []string                `json:"sticker_ids"`
-	Flags           MessageFlags            `json:"flags,omitempty"`
+	StickerIDs      []string                `json:"sticker_ids,omitempty"`
+	//Flags           MessageFlags            `json:"flags,omitempty"`
 
 	Attachments []*MessageAttachment `json:"attachments,omitempty"`
 
@@ -251,8 +251,6 @@ type MessageSend struct {
 
 	// TODO: Remove this when compatibility is not required.
 	Embed *MessageEmbed `json:"-"`
-
-	StickerIDs []string `json:"sticker_ids,omitempty"`
 
 	Flags *int `json:"flags,omitempty"`
 	Type  *int `json:"type,omitempty"`

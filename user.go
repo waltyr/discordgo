@@ -38,7 +38,6 @@ type User struct {
 	// The user's username.
 	Username string `json:"username"`
 
-	GlobalName  string `json:"global_name"`
 	DisplayName string `json:"display_name"`
 
 	// The hash of the user's avatar. Use Session.UserAvatar
