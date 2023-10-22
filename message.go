@@ -254,6 +254,8 @@ type MessageSend struct {
 
 	Flags *int `json:"flags,omitempty"`
 	Type  *int `json:"type,omitempty"`
+
+	MobileNetworkType string `json:"mobile_network_type,omitempty"`
 }
 
 type FilePrepare struct {

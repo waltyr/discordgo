@@ -1943,6 +1943,7 @@ func (s *Session) ChannelMessageSendComplex(channelID string, data *MessageSend,
 			} else {
 				data.Flags = &zero
 			}
+			data.MobileNetworkType = "unknown"
 		}
 		response, err = s.RequestWithBucketID("POST", endpoint, data, endpoint, options...)
 	}
