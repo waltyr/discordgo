@@ -49,6 +49,8 @@ type User struct {
 	// the application possesses the email scope for the user.
 	Email string `json:"email"`
 
+	Phone string `json:"phone"`
+
 	// The user's username.
 	Username string `json:"username"`
 
