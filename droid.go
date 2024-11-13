@@ -14,14 +14,14 @@ const (
 	droidBrowser           = "Chrome"
 	droidReferrer          = "https://discord.com/channels/@me"
 	droidReferringDomain   = "discord.com"
-	droidClientBuildNumber = "236850"
+	droidClientBuildNumber = "343844"
 	droidReleaseChannel    = "stable"
 	droidStatus            = "invisible"
 	droidSystemLocale      = "en-US"
 )
 
 const (
-	DroidBrowserMajorVersion = "118"
+	DroidBrowserMajorVersion = "130"
 	DroidBrowserVersion      = DroidBrowserMajorVersion + ".0.0.0"
 	DroidBrowserUserAgent    = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/" + DroidBrowserVersion + " Safari/537.36"
 )
@@ -41,7 +41,6 @@ type UserIdentifyProperties struct {
 	ReleaseChannel         string  `json:"release_channel"`
 	ClientBuildNumber      string  `json:"client_build_number"`
 	ClientEventSource      *string `json:"client_event_source"`
-	DesignID               int     `json:"design_id"`
 }
 
 type ClientState struct {
@@ -84,7 +83,6 @@ var (
 		ClientBuildNumber: droidClientBuildNumber,
 		ReleaseChannel:    droidReleaseChannel,
 		SystemLocale:      droidSystemLocale,
-		DesignID:          0,
 	}
 	DroidFetchHeaders = map[string]string{
 		"Sec-CH-UA":          fmt.Sprintf(`" Not A;Brand";v="99", "Chromium";v="%[1]s", "Google Chrome";v="%[1]s"`, DroidBrowserMajorVersion),
@@ -92,8 +90,10 @@ var (
 		"Sec-CH-UA-Platform": droidOS,
 		"Sec-Fetch-Dest":     "empty",
 		"Sec-Fetch-Mode":     "cors",
-		"Sec-Fetch-Site":     "sameorigin",
+		"Sec-Fetch-Site":     "same-origin",
+		"X-Debug-Options":    "bugReporterEnabled",
 		"X-Discord-Locale":   droidSystemLocale,
+		"X-Discord-Timezone": "UTC",
 		"X-Super-Properties": mustMarshalJSON(droidIdentifyProperties),
 
 		"Accept":          "*/*",
