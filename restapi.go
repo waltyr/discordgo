@@ -1922,7 +1922,7 @@ func (s *Session) ChannelMessageSendComplex(channelID string, data *MessageSend,
 	}
 
 	if data.StickerIDs != nil {
-		if len(data.StickerIDs) > 3 {
+		if len(*data.StickerIDs) > 3 {
 			err = fmt.Errorf("cannot send more than 3 stickers")
 			return
 		}
@@ -1940,10 +1940,18 @@ func (s *Session) ChannelMessageSendComplex(channelID string, data *MessageSend,
 			zero := 0
 			if data.Attachments != nil {
 				data.Type = &zero
+				if data.StickerIDs == nil {
+					emptyArr := make([]string, 0)
+					data.StickerIDs = &emptyArr
+				}
 			} else {
 				data.Flags = &zero
+				data.MobileNetworkType = "unknown"
+				if data.TTS == nil {
+					var falseVal bool
+					data.TTS = &falseVal
+				}
 			}
-			data.MobileNetworkType = "unknown"
 		}
 		response, err = s.RequestWithBucketID("POST", endpoint, data, endpoint, options...)
 	}
@@ -1972,9 +1980,10 @@ func (s *Session) ChannelAttachmentCreate(channelID string, data *ReqPrepareAtta
 // channelID : The ID of a Channel.
 // content   : The message to send.
 func (s *Session) ChannelMessageSendTTS(channelID string, content string, options ...RequestOption) (*Message, error) {
+	trueVal := true
 	return s.ChannelMessageSendComplex(channelID, &MessageSend{
 		Content: content,
-		TTS:     true,
+		TTS:     &trueVal,
 	}, options...)
 }
 

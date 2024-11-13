@@ -236,12 +236,12 @@ type MessageSend struct {
 
 	Content         string                  `json:"content"`
 	Embeds          []*MessageEmbed         `json:"embeds,omitempty"`
-	TTS             bool                    `json:"tts"`
+	TTS             *bool                   `json:"tts,omitempty"`
 	Components      []MessageComponent      `json:"components,omitempty"`
 	Files           []*File                 `json:"-"`
 	AllowedMentions *MessageAllowedMentions `json:"allowed_mentions,omitempty"`
 	Reference       *MessageReference       `json:"message_reference,omitempty"`
-	StickerIDs      []string                `json:"sticker_ids,omitempty"`
+	StickerIDs      *[]string               `json:"sticker_ids,omitempty"`
 	//Flags           MessageFlags            `json:"flags,omitempty"`
 
 	Attachments []*MessageAttachment `json:"attachments,omitempty"`
