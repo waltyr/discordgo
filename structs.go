@@ -149,6 +149,28 @@ type Session struct {
 	Logger func(msgL, caller int, format string, a ...interface{})
 }
 
+// ApplicationIntegrationType dictates where application can be installed and its available interaction contexts.
+type ApplicationIntegrationType uint
+
+const (
+	// ApplicationIntegrationGuildInstall indicates that app is installable to guilds.
+	ApplicationIntegrationGuildInstall ApplicationIntegrationType = 0
+	// ApplicationIntegrationUserInstall indicates that app is installable to users.
+	ApplicationIntegrationUserInstall ApplicationIntegrationType = 1
+)
+
+// ApplicationInstallParams represents application's installation parameters
+// for default in-app oauth2 authorization link.
+type ApplicationInstallParams struct {
+	Scopes      []string `json:"scopes"`
+	Permissions int64    `json:"permissions,string"`
+}
+
+// ApplicationIntegrationTypeConfig represents application's configuration for a particular integration type.
+type ApplicationIntegrationTypeConfig struct {
+	OAuth2InstallParams *ApplicationInstallParams `json:"oauth2_install_params,omitempty"`
+}
+
 // Application stores values for a Discord Application
 type Application struct {
 	ID                  string   `json:"id,omitempty"`
@@ -169,6 +191,8 @@ type Application struct {
 	Slug                string   `json:"slug"`
 	CoverImage          string   `json:"cover_image"`
 	Flags               int      `json:"flags,omitempty"`
+
+	IntegrationTypesConfig map[ApplicationIntegrationType]*ApplicationIntegrationTypeConfig `json:"integration_types,omitempty"`
 
 	Bot *User `json:"bot,omitempty"`
 }
@@ -248,11 +272,15 @@ type IntegrationAccount struct {
 }
 
 // A VoiceRegion stores data for a specific voice region server.
+// https://discord.com/developers/docs/resources/voice#voice-region-object
 type VoiceRegion struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Hostname string `json:"sample_hostname"`
-	Port     int    `json:"sample_port"`
+	ID         string `json:"id"`
+	Name       string `json:"name"`
+	Optimal    bool   `json:"optimal"`
+	Deprecated bool   `json:"deprecated"`
+	Custom     bool   `json:"custom"`
+	Hostname   string `json:"sample_hostname"`
+	Port       int    `json:"sample_port"`
 }
 
 // A VoiceICE stores data for voice ICE servers.
@@ -318,7 +346,9 @@ const (
 	ChannelTypeGuildPublicThread  ChannelType = 11
 	ChannelTypeGuildPrivateThread ChannelType = 12
 	ChannelTypeGuildStageVoice    ChannelType = 13
+	ChannelTypeGuildDirectory     ChannelType = 14
 	ChannelTypeGuildForum         ChannelType = 15
+	ChannelTypeGuildMedia         ChannelType = 16
 )
 
 // ChannelFlags represent flags of a channel/thread.
@@ -654,6 +684,7 @@ type EmojiParams struct {
 	// NOTE: can be only set on creation.
 	Image string `json:"image,omitempty"`
 	// Roles for which this emoji will be available.
+	// NOTE: can not be used with application emoji endpoints.
 	Roles []string `json:"roles,omitempty"`
 }
 
@@ -1325,6 +1356,14 @@ type UserGuild struct {
 	Owner       bool           `json:"owner"`
 	Permissions int64          `json:"permissions,string"`
 	Features    []GuildFeature `json:"features"`
+
+	// Approximate number of members in this guild.
+	// NOTE: this field is only filled when withCounts is true.
+	ApproximateMemberCount int `json:"approximate_member_count"`
+
+	// Approximate number of non-offline members in this guild.
+	// NOTE: this field is only filled when withCounts is true.
+	ApproximatePresenceCount int `json:"approximate_presence_count"`
 }
 
 // GuildFeature indicates the presence of a feature in a guild
@@ -1860,6 +1899,10 @@ type AutoModerationActionMetadata struct {
 	// Timeout duration in seconds (maximum of 2419200 - 4 weeks).
 	// NOTE: should be only used with timeout action type.
 	Duration int `json:"duration_seconds,omitempty"`
+
+	// Additional explanation that will be shown to members whenever their message is blocked (maximum of 150 characters).
+	// NOTE: should be only used with block message action type.
+	CustomMessage string `json:"custom_message,omitempty"`
 }
 
 // AutoModerationAction stores data for an auto moderation action.
@@ -2008,8 +2051,8 @@ const (
 	AuditLogChangeKeyPrivacylevel AuditLogChangeKey = "privacy_level"
 	// AuditLogChangeKeyPruneDeleteDays is sent when number of days after which inactive and role-unassigned members are kicked changed (int) - guild
 	AuditLogChangeKeyPruneDeleteDays AuditLogChangeKey = "prune_delete_days"
-	// AuditLogChangeKeyPulibUpdatesChannelID is sent when id of the public updates channel changed (snowflake) - guild
-	AuditLogChangeKeyPulibUpdatesChannelID AuditLogChangeKey = "public_updates_channel_id"
+	// AuditLogChangeKeyPublicUpdatesChannelID is sent when id of the public updates channel changed (snowflake) - guild
+	AuditLogChangeKeyPublicUpdatesChannelID AuditLogChangeKey = "public_updates_channel_id"
 	// AuditLogChangeKeyRateLimitPerUser is sent when amount of seconds a user has to wait before sending another message changed (int) - channel
 	AuditLogChangeKeyRateLimitPerUser AuditLogChangeKey = "rate_limit_per_user"
 	// AuditLogChangeKeyRegion is sent when region changed (string) - guild
@@ -2155,6 +2198,15 @@ const (
 
 	AuditLogActionCreatorMonetizationRequestCreated AuditLogAction = 150
 	AuditLogActionCreatorMonetizationTermsAccepted  AuditLogAction = 151
+
+	AuditLogActionOnboardingPromptCreate AuditLogAction = 163
+	AuditLogActionOnboardingPromptUpdate AuditLogAction = 164
+	AuditLogActionOnboardingPromptDelete AuditLogAction = 165
+	AuditLogActionOnboardingCreate       AuditLogAction = 166
+	AuditLogActionOnboardingUpdate       AuditLogAction = 167
+
+	AuditLogActionHomeSettingsCreate = 190
+	AuditLogActionHomeSettingsUpdate = 191
 )
 
 // A UserGuildSettingsChannelOverride stores data for a channel override for a users guild settings.
@@ -2338,7 +2390,7 @@ func (activity *Activity) UnmarshalJSON(b []byte) error {
 		Type          ActivityType `json:"type"`
 		URL           string       `json:"url,omitempty"`
 		CreatedAt     int64        `json:"created_at"`
-		ApplicationID string       `json:"application_id,omitempty"`
+		ApplicationID json.Number  `json:"application_id,omitempty"`
 		State         string       `json:"state,omitempty"`
 		Details       string       `json:"details,omitempty"`
 		Timestamps    TimeStamps   `json:"timestamps,omitempty"`
@@ -2353,8 +2405,8 @@ func (activity *Activity) UnmarshalJSON(b []byte) error {
 	if err != nil {
 		return err
 	}
+	activity.ApplicationID = temp.ApplicationID.String()
 	activity.CreatedAt = time.Unix(0, temp.CreatedAt*1000000)
-	activity.ApplicationID = temp.ApplicationID
 	activity.Assets = temp.Assets
 	activity.Details = temp.Details
 	activity.Emoji = temp.Emoji
@@ -2466,63 +2518,229 @@ const (
 	StageInstancePrivacyLevelGuildOnly StageInstancePrivacyLevel = 2
 )
 
+// PollLayoutType represents the layout of a poll.
+type PollLayoutType int
+
+// Valid PollLayoutType values.
+const (
+	PollLayoutTypeDefault PollLayoutType = 1
+)
+
+// PollMedia contains common data used by question and answers.
+type PollMedia struct {
+	Text  string          `json:"text,omitempty"`
+	Emoji *ComponentEmoji `json:"emoji,omitempty"` // TODO: rename the type
+}
+
+// PollAnswer represents a single answer in a poll.
+type PollAnswer struct {
+	// NOTE: should not be set on creation.
+	AnswerID int        `json:"answer_id,omitempty"`
+	Media    *PollMedia `json:"poll_media"`
+}
+
+// PollAnswerCount stores counted poll votes for a single answer.
+type PollAnswerCount struct {
+	ID      int  `json:"id"`
+	Count   int  `json:"count"`
+	MeVoted bool `json:"me_voted"`
+}
+
+// PollResults contains voting results on a poll.
+type PollResults struct {
+	Finalized    bool               `json:"is_finalized"`
+	AnswerCounts []*PollAnswerCount `json:"answer_counts"`
+}
+
+// Poll contains all poll related data.
+type Poll struct {
+	Question         PollMedia      `json:"question"`
+	Answers          []PollAnswer   `json:"answers"`
+	AllowMultiselect bool           `json:"allow_multiselect"`
+	LayoutType       PollLayoutType `json:"layout_type,omitempty"`
+
+	// NOTE: should be set only on creation, when fetching use Expiry.
+	Duration int `json:"duration,omitempty"`
+
+	// NOTE: available only when fetching.
+
+	Results *PollResults `json:"results,omitempty"`
+	// NOTE: as Discord documentation notes, this field might be null even when fetching.
+	Expiry *time.Time `json:"expiry,omitempty"`
+}
+
 // Constants for the different bit offsets of text channel permissions
 const (
 	// Deprecated: PermissionReadMessages has been replaced with PermissionViewChannel for text and voice channels
-	PermissionReadMessages          = 0x0000000000000400
-	PermissionSendMessages          = 0x0000000000000800
-	PermissionSendTTSMessages       = 0x0000000000001000
-	PermissionManageMessages        = 0x0000000000002000
-	PermissionEmbedLinks            = 0x0000000000004000
-	PermissionAttachFiles           = 0x0000000000008000
-	PermissionReadMessageHistory    = 0x0000000000010000
-	PermissionMentionEveryone       = 0x0000000000020000
-	PermissionUseExternalEmojis     = 0x0000000000040000
-	PermissionUseSlashCommands      = 0x0000000080000000
-	PermissionManageThreads         = 0x0000000400000000
-	PermissionCreatePublicThreads   = 0x0000000800000000
-	PermissionCreatePrivateThreads  = 0x0000001000000000
-	PermissionUseExternalStickers   = 0x0000002000000000
-	PermissionSendMessagesInThreads = 0x0000004000000000
+	PermissionReadMessages = 1 << 10
+
+	// Allows for sending messages in a channel and creating threads in a forum (does not allow sending messages in threads).
+	PermissionSendMessages = 1 << 11
+
+	// Allows for sending of /tts messages.
+	PermissionSendTTSMessages = 1 << 12
+
+	// Allows for deletion of other users messages.
+	PermissionManageMessages = 1 << 13
+
+	// Links sent by users with this permission will be auto-embedded.
+	PermissionEmbedLinks = 1 << 14
+
+	// Allows for uploading images and files.
+	PermissionAttachFiles = 1 << 15
+
+	// Allows for reading of message history.
+	PermissionReadMessageHistory = 1 << 16
+
+	// Allows for using the @everyone tag to notify all users in a channel, and the @here tag to notify all online users in a channel.
+	PermissionMentionEveryone = 1 << 17
+
+	// Allows the usage of custom emojis from other servers.
+	PermissionUseExternalEmojis = 1 << 18
+
+	// Deprecated: PermissionUseSlashCommands has been replaced by PermissionUseApplicationCommands
+	PermissionUseSlashCommands = 1 << 31
+
+	// Allows members to use application commands, including slash commands and context menu commands.
+	PermissionUseApplicationCommands = 1 << 31
+
+	// Allows for deleting and archiving threads, and viewing all private threads.
+	PermissionManageThreads = 1 << 34
+
+	// Allows for creating public and announcement threads.
+	PermissionCreatePublicThreads = 1 << 35
+
+	// Allows for creating private threads.
+	PermissionCreatePrivateThreads = 1 << 36
+
+	// Allows the usage of custom stickers from other servers.
+	PermissionUseExternalStickers = 1 << 37
+
+	// Allows for sending messages in threads.
+	PermissionSendMessagesInThreads = 1 << 38
+
+	// Allows sending voice messages.
+	PermissionSendVoiceMessages = 1 << 46
+
+	// Allows sending polls.
+	PermissionSendPolls = 1 << 49
+
+	// Allows user-installed apps to send public responses. When disabled, users will still be allowed to use their apps but the responses will be ephemeral. This only applies to apps not also installed to the server.
+	PermissionUseExternalApps = 1 << 50
 )
 
 // Constants for the different bit offsets of voice permissions
 const (
-	PermissionVoicePrioritySpeaker = 0x0000000000000100
-	PermissionVoiceStreamVideo     = 0x0000000000000200
-	PermissionVoiceConnect         = 0x0000000000100000
-	PermissionVoiceSpeak           = 0x0000000000200000
-	PermissionVoiceMuteMembers     = 0x0000000000400000
-	PermissionVoiceDeafenMembers   = 0x0000000000800000
-	PermissionVoiceMoveMembers     = 0x0000000001000000
-	PermissionVoiceUseVAD          = 0x0000000002000000
-	PermissionVoiceRequestToSpeak  = 0x0000000100000000
-	PermissionUseActivities        = 0x0000008000000000
+	// Allows for using priority speaker in a voice channel.
+	PermissionVoicePrioritySpeaker = 1 << 8
+
+	// Allows the user to go live.
+	PermissionVoiceStreamVideo = 1 << 9
+
+	// Allows for joining of a voice channel.
+	PermissionVoiceConnect = 1 << 20
+
+	// Allows for speaking in a voice channel.
+	PermissionVoiceSpeak = 1 << 21
+
+	// Allows for muting members in a voice channel.
+	PermissionVoiceMuteMembers = 1 << 22
+
+	// Allows for deafening of members in a voice channel.
+	PermissionVoiceDeafenMembers = 1 << 23
+
+	// Allows for moving of members between voice channels.
+	PermissionVoiceMoveMembers = 1 << 24
+
+	// Allows for using voice-activity-detection in a voice channel.
+	PermissionVoiceUseVAD = 1 << 25
+
+	// Allows for requesting to speak in stage channels.
+	PermissionVoiceRequestToSpeak = 1 << 32
+
+	// Deprecated: PermissionUseActivities has been replaced by PermissionUseEmbeddedActivities.
+	PermissionUseActivities = 1 << 39
+
+	// Allows for using Activities (applications with the EMBEDDED flag) in a voice channel.
+	PermissionUseEmbeddedActivities = 1 << 39
+
+	// Allows for using soundboard in a voice channel.
+	PermissionUseSoundboard = 1 << 42
+
+	// Allows the usage of custom soundboard sounds from other servers.
+	PermissionUseExternalSounds = 1 << 45
 )
 
 // Constants for general management.
 const (
-	PermissionChangeNickname  = 0x0000000004000000
-	PermissionManageNicknames = 0x0000000008000000
-	PermissionManageRoles     = 0x0000000010000000
-	PermissionManageWebhooks  = 0x0000000020000000
-	PermissionManageEmojis    = 0x0000000040000000
-	PermissionManageEvents    = 0x0000000200000000
+	// Allows for modification of own nickname.
+	PermissionChangeNickname = 1 << 26
+
+	// Allows for modification of other users nicknames.
+	PermissionManageNicknames = 1 << 27
+
+	// Allows management and editing of roles.
+	PermissionManageRoles = 1 << 28
+
+	// Allows management and editing of webhooks.
+	PermissionManageWebhooks = 1 << 29
+
+	// Deprecated: PermissionManageEmojis has been replaced by PermissionManageGuildExpressions.
+	PermissionManageEmojis = 1 << 30
+
+	// Allows for editing and deleting emojis, stickers, and soundboard sounds created by all users.
+	PermissionManageGuildExpressions = 1 << 30
+
+	// Allows for editing and deleting scheduled events created by all users.
+	PermissionManageEvents = 1 << 33
+
+	// Allows for viewing role subscription insights.
+	PermissionViewCreatorMonetizationAnalytics = 1 << 41
+
+	// Allows for creating emojis, stickers, and soundboard sounds, and editing and deleting those created by the current user.
+	PermissionCreateGuildExpressions = 1 << 43
+
+	// Allows for creating scheduled events, and editing and deleting those created by the current user.
+	PermissionCreateEvents = 1 << 44
 )
 
 // Constants for the different bit offsets of general permissions
 const (
-	PermissionCreateInstantInvite = 0x0000000000000001
-	PermissionKickMembers         = 0x0000000000000002
-	PermissionBanMembers          = 0x0000000000000004
-	PermissionAdministrator       = 0x0000000000000008
-	PermissionManageChannels      = 0x0000000000000010
-	PermissionManageServer        = 0x0000000000000020
-	PermissionAddReactions        = 0x0000000000000040
-	PermissionViewAuditLogs       = 0x0000000000000080
-	PermissionViewChannel         = 0x0000000000000400
-	PermissionViewGuildInsights   = 0x0000000000080000
-	PermissionModerateMembers     = 0x0000010000000000
+	// Allows creation of instant invites.
+	PermissionCreateInstantInvite = 1 << 0
+
+	// Allows kicking members.
+	PermissionKickMembers = 1 << 1
+
+	// Allows banning members.
+	PermissionBanMembers = 1 << 2
+
+	// Allows all permissions and bypasses channel permission overwrites.
+	PermissionAdministrator = 1 << 3
+
+	// Allows management and editing of channels.
+	PermissionManageChannels = 1 << 4
+
+	// Deprecated: PermissionManageServer has been replaced by PermissionManageGuild.
+	PermissionManageServer = 1 << 5
+
+	// Allows management and editing of the guild.
+	PermissionManageGuild = 1 << 5
+
+	// Allows for the addition of reactions to messages.
+	PermissionAddReactions = 1 << 6
+
+	// Allows for viewing of audit logs.
+	PermissionViewAuditLogs = 1 << 7
+
+	// Allows guild members to view a channel, which includes reading messages in text channels and joining voice channels.
+	PermissionViewChannel = 1 << 10
+
+	// Allows for viewing guild insights.
+	PermissionViewGuildInsights = 1 << 19
+
+	// Allows for timing out users to prevent them from sending or reacting to messages in chat and threads, and from speaking in voice and stage channels.
+	PermissionModerateMembers = 1 << 40
 
 	PermissionAllText = PermissionViewChannel |
 		PermissionSendMessages |

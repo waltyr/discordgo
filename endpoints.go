@@ -176,6 +176,16 @@ var (
 		return EndpointMessageReactions(cID, mID, eID) + "/" + uID
 	}
 
+	EndpointPoll = func(cID, mID string) string {
+		return EndpointChannel(cID) + "/polls/" + mID
+	}
+	EndpointPollAnswerVoters = func(cID, mID string, aID int) string {
+		return EndpointPoll(cID, mID) + "/answers/" + strconv.Itoa(aID)
+	}
+	EndpointPollExpire = func(cID, mID string) string {
+		return EndpointPoll(cID, mID) + "/expire"
+	}
+
 	EndpointApplicationGlobalCommands = func(aID string) string {
 		return EndpointApplication(aID) + "/commands"
 	}
@@ -221,6 +231,9 @@ var (
 	EndpointApplications                      = EndpointAPI + "applications"
 	EndpointApplication                       = func(aID string) string { return EndpointApplications + "/" + aID }
 	EndpointApplicationRoleConnectionMetadata = func(aID string) string { return EndpointApplication(aID) + "/role-connections/metadata" }
+
+	EndpointApplicationEmojis = func(aID string) string { return EndpointApplication(aID) + "/emojis" }
+	EndpointApplicationEmoji  = func(aID, eID string) string { return EndpointApplication(aID) + "/emojis/" + eID }
 
 	EndpointOAuth2                  = EndpointAPI + "oauth2/"
 	EndpointOAuth2Applications      = EndpointOAuth2 + "applications"
