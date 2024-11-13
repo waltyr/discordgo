@@ -703,6 +703,10 @@ type StickerItem struct {
 	FormatType StickerFormat `json:"format_type"`
 }
 
+func (sticker *StickerItem) URL() string {
+	return EndpointStickerImage(sticker.ID, sticker.FormatType)
+}
+
 // StickerPack represents a pack of standard stickers.
 type StickerPack struct {
 	ID             string     `json:"id"`
