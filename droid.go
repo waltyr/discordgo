@@ -8,16 +8,19 @@ import (
 )
 
 const (
-	droidCapabilities      = 16381
-	droidOS                = "Windows"
-	droidOSVersion         = "10"
-	droidBrowser           = "Chrome"
-	droidReferrer          = "https://discord.com/channels/@me"
-	droidReferringDomain   = "discord.com"
-	droidClientBuildNumber = "343844"
-	droidReleaseChannel    = "stable"
-	droidStatus            = "invisible"
-	droidSystemLocale      = "en-US"
+	droidOS              = "Windows"
+	droidOSVersion       = "10"
+	droidBrowser         = "Chrome"
+	droidReferrer        = "https://discord.com/channels/@me"
+	droidReferringDomain = "discord.com"
+	droidReleaseChannel  = "stable"
+	droidStatus          = "invisible"
+	droidSystemLocale    = "en-US"
+)
+
+var (
+	droidCapabilities      = 30717
+	droidClientBuildNumber = "346831"
 )
 
 const (
@@ -69,6 +72,15 @@ func basedOn(base map[string]string, additional map[string]string) map[string]st
 		}
 	}
 	return additional
+}
+
+func UpdateVersion(version string, capabilities int) {
+	droidClientBuildNumber = version
+	droidCapabilities = capabilities
+	droidIdentifyProperties.ClientBuildNumber = version
+	DroidFetchHeaders["X-Super-Properties"] = mustMarshalJSON(droidIdentifyProperties)
+	DroidDownloadHeaders["X-Super-Properties"] = DroidFetchHeaders["X-Super-Properties"]
+	DroidImageHeaders["X-Super-Properties"] = DroidFetchHeaders["X-Super-Properties"]
 }
 
 var (
