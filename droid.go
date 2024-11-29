@@ -1,9 +1,14 @@
 package discordgo
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+	"regexp"
+	"sync"
 )
 
 const (
@@ -20,7 +25,11 @@ const (
 var (
 	droidCapabilities      = 30717
 	droidClientBuildNumber = "348981"
+	droidGatewayURL        = ""
+	mainPageLoaded         = false
 )
+
+var mainPageLoadLock sync.Mutex
 
 const (
 	DroidBrowserMajorVersion = "131"
@@ -82,6 +91,96 @@ func UpdateVersion(version string, capabilities int) {
 	DroidImageHeaders["X-Super-Properties"] = DroidFetchHeaders["X-Super-Properties"]
 }
 
+func (s *Session) SetGatewayURL(url string) {
+	s.gateway = url + "?encoding=json&v=" + APIVersion + "&compress=zlib-stream"
+	s.noClearGateway = true
+}
+
+var apiVersionRegex = regexp.MustCompile(`API_VERSION: (\d+),`)
+var gatewayURLRegex = regexp.MustCompile(`GATEWAY_ENDPOINT:\s?['"](.+?)['"],`)
+var mainJSRegex = regexp.MustCompile(`src="(/assets/web.[a-f0-9]{20}.js)"`)
+var buildNumberRegex = regexp.MustCompile(`(?:buildNumber|build_number):\s?['"]?(\d{6,})['"]?`)
+
+func (s *Session) LoadMainPage(ctx context.Context) error {
+	mainPageLoadLock.Lock()
+	defer mainPageLoadLock.Unlock()
+	if mainPageLoaded && droidGatewayURL != "" {
+		s.SetGatewayURL(droidGatewayURL)
+		return nil
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://discord.com/channels/@me", nil)
+	if err != nil {
+		return fmt.Errorf("failed to prepare request: %w", err)
+	}
+	for name, value := range DroidBaseHeaders {
+		req.Header.Add(name, value)
+	}
+	req.Header.Set("Sec-Fetch-Dest", "document")
+	req.Header.Set("Sec-Fetch-Mode", "navigate")
+	req.Header.Set("Sec-Fetch-Site", "none")
+	req.Header.Set("Sec-Fetch-User", "?1")
+	req.Header.Set("Upgrade-Insecure-Requests", "1")
+	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
+	resp, err := s.Client.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to fetch main page: %w", err)
+	}
+	data, err := io.ReadAll(resp.Body)
+	_ = resp.Body.Close()
+	if err != nil {
+		return fmt.Errorf("failed to read main page: %w", err)
+	}
+
+	apiVersionMatch := apiVersionRegex.FindSubmatch(data)
+	if apiVersionMatch == nil {
+		return fmt.Errorf("failed to find API version")
+	} else if string(apiVersionMatch[1]) != APIVersion {
+		return fmt.Errorf("API version mismatch: expected %s, got %s", APIVersion, apiVersionMatch[1])
+	}
+	gatewayURLMatch := gatewayURLRegex.FindSubmatch(data)
+	if gatewayURLMatch == nil {
+		return fmt.Errorf("failed to find gateway URL")
+	}
+	droidGatewayURL = string(gatewayURLMatch[1])
+	s.log(LogInformational, "Found gateway URL %s and confirmed API version", droidGatewayURL)
+	s.SetGatewayURL(droidGatewayURL)
+	mainJSMatch := mainJSRegex.FindSubmatch(data)
+	if mainJSMatch == nil {
+		return fmt.Errorf("failed to find main JS URL")
+	}
+
+	jsReq, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://discord.com"+string(mainJSMatch[1]), nil)
+	if err != nil {
+		return fmt.Errorf("failed to prepare JS request: %w", err)
+	}
+	for name, value := range DroidBaseHeaders {
+		req.Header.Add(name, value)
+	}
+	jsReq.Header.Set("Sec-Fetch-Dest", "script")
+	jsReq.Header.Set("Sec-Fetch-Mode", "no-cors")
+	jsReq.Header.Set("Sec-Fetch-Site", "same-origin")
+	jsReq.Header.Set("Accept", "*/*")
+	jsResp, err := s.Client.Do(jsReq)
+	if err != nil {
+		return fmt.Errorf("failed to fetch JS: %w", err)
+	}
+	jsData, err := io.ReadAll(jsResp.Body)
+	_ = jsResp.Body.Close()
+	if err != nil {
+		return fmt.Errorf("failed to read JS: %w", err)
+	}
+	buildNumberMatch := buildNumberRegex.FindSubmatch(jsData)
+	if buildNumberMatch == nil {
+		return fmt.Errorf("failed to find build number")
+	}
+	s.log(LogInformational, "Found build number %s from JS file %s", buildNumberMatch[1], string(mainJSMatch[1]))
+	// TODO parse capabilities too?
+	UpdateVersion(string(buildNumberMatch[1]), droidCapabilities)
+	mainPageLoaded = true
+
+	return nil
+}
+
 var (
 	droidIdentifyProperties = &UserIdentifyProperties{
 		OS:               droidOS,
@@ -95,10 +194,17 @@ var (
 		ReleaseChannel:    droidReleaseChannel,
 		SystemLocale:      droidSystemLocale,
 	}
-	DroidFetchHeaders = map[string]string{
-		"Sec-CH-UA":          fmt.Sprintf(`" Not A;Brand";v="99", "Chromium";v="%[1]s", "Google Chrome";v="%[1]s"`, DroidBrowserMajorVersion),
-		"Sec-CH-UA-Mobile":   "?0",
-		"Sec-CH-UA-Platform": droidOS,
+	DroidBaseHeaders = map[string]string{
+		"Sec-Ch-Ua":          fmt.Sprintf(`" Not A;Brand";v="99", "Chromium";v="%[1]s", "Google Chrome";v="%[1]s"`, DroidBrowserMajorVersion),
+		"Sec-Ch-Ua-Mobile":   "?0",
+		"Sec-Ch-Ua-Platform": droidOS,
+
+		"Accept":          "*/*",
+		"Origin":          "https://discord.com",
+		"Accept-Language": "en-US,en;q=0.9",
+		"User-Agent":      DroidBrowserUserAgent,
+	}
+	DroidFetchHeaders = basedOn(DroidBaseHeaders, map[string]string{
 		"Sec-Fetch-Dest":     "empty",
 		"Sec-Fetch-Mode":     "cors",
 		"Sec-Fetch-Site":     "same-origin",
@@ -106,12 +212,7 @@ var (
 		"X-Discord-Locale":   droidSystemLocale,
 		"X-Discord-Timezone": "UTC",
 		"X-Super-Properties": mustMarshalJSON(droidIdentifyProperties),
-
-		"Accept":          "*/*",
-		"Origin":          "https://discord.com",
-		"Accept-Language": "en-US,en;q=0.9",
-		"User-Agent":      DroidBrowserUserAgent,
-	}
+	})
 	DroidDownloadHeaders = basedOn(DroidFetchHeaders, map[string]string{
 		"Sec-Fetch-Mode": "no-cors",
 	})

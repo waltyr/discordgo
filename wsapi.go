@@ -102,7 +102,9 @@ func (s *Session) Open() error {
 	s.wsConn, _, err = s.Dialer.Dial(s.gateway, header)
 	if err != nil {
 		s.log(LogError, "error connecting to gateway %s, %s", s.gateway, err)
-		s.gateway = "" // clear cached gateway
+		if !s.noClearGateway {
+			s.gateway = "" // clear cached gateway
+		}
 		s.wsConn = nil // Just to be safe.
 		s.closeZLib()
 		return err

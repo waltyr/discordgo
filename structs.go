@@ -138,6 +138,8 @@ type Session struct {
 	// stores sessions current Discord Gateway
 	gateway string
 
+	noClearGateway bool
+
 	// stores session ID of current Gateway connection
 	sessionID string
 
