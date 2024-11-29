@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -143,6 +144,9 @@ func (s *Session) LoadMainPage(ctx context.Context) error {
 		return fmt.Errorf("failed to find gateway URL")
 	}
 	droidGatewayURL = string(gatewayURLMatch[1])
+	if !strings.HasSuffix(droidGatewayURL, "/") {
+		droidGatewayURL += "/"
+	}
 	s.log(LogInformational, "Found gateway URL %s and confirmed API version", droidGatewayURL)
 	s.SetGatewayURL(droidGatewayURL)
 	mainJSMatch := mainJSRegex.FindSubmatch(data)
