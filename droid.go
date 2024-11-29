@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"regexp"
+	"strconv"
 	"sync"
 )
 
@@ -24,7 +25,7 @@ const (
 
 var (
 	droidCapabilities      = 30717
-	droidClientBuildNumber = "348981"
+	droidClientBuildNumber = 348981
 	droidGatewayURL        = ""
 	mainPageLoaded         = false
 )
@@ -50,7 +51,7 @@ type UserIdentifyProperties struct {
 	ReferrerCurrent        string  `json:"referrer_current"`
 	ReferringDomainCurrent string  `json:"referring_domain_current"`
 	ReleaseChannel         string  `json:"release_channel"`
-	ClientBuildNumber      string  `json:"client_build_number"`
+	ClientBuildNumber      int     `json:"client_build_number"`
 	ClientEventSource      *string `json:"client_event_source"`
 }
 
@@ -82,7 +83,7 @@ func basedOn(base map[string]string, additional map[string]string) map[string]st
 	return additional
 }
 
-func UpdateVersion(version string, capabilities int) {
+func UpdateVersion(version, capabilities int) {
 	droidClientBuildNumber = version
 	droidCapabilities = capabilities
 	droidIdentifyProperties.ClientBuildNumber = version
@@ -173,9 +174,13 @@ func (s *Session) LoadMainPage(ctx context.Context) error {
 	if buildNumberMatch == nil {
 		return fmt.Errorf("failed to find build number")
 	}
-	s.log(LogInformational, "Found build number %s from JS file %s", buildNumberMatch[1], string(mainJSMatch[1]))
+	buildNumberInt, err := strconv.Atoi(string(buildNumberMatch[1]))
+	if err != nil {
+		return fmt.Errorf("failed to parse build number %s: %w", buildNumberMatch[1], err)
+	}
+	s.log(LogInformational, "Found build number %d from JS file %s", buildNumberInt, string(mainJSMatch[1]))
 	// TODO parse capabilities too?
-	UpdateVersion(string(buildNumberMatch[1]), droidCapabilities)
+	UpdateVersion(buildNumberInt, droidCapabilities)
 	mainPageLoaded = true
 
 	return nil
