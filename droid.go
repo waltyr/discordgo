@@ -20,11 +20,11 @@ const (
 
 var (
 	droidCapabilities      = 30717
-	droidClientBuildNumber = "346831"
+	droidClientBuildNumber = "348981"
 )
 
 const (
-	DroidBrowserMajorVersion = "130"
+	DroidBrowserMajorVersion = "131"
 	DroidBrowserVersion      = DroidBrowserMajorVersion + ".0.0.0"
 	DroidBrowserUserAgent    = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/" + DroidBrowserVersion + " Safari/537.36"
 )
@@ -48,12 +48,12 @@ type UserIdentifyProperties struct {
 
 type ClientState struct {
 	GuildVersions            struct{} `json:"guild_versions"`
-	HighestLastMessageID     string   `json:"highest_last_message_id"`
-	ReadStateVersion         int      `json:"read_state_version"`
-	UserGuildSettingsVersion int      `json:"user_guild_settings_version"`
-	UserSettingsVersion      int      `json:"user_settings_version"`
-	PrivateChannelsVersion   string   `json:"private_channels_version"`
-	APICodeVersion           int      `json:"api_code_version"`
+	HighestLastMessageID     string   `json:"highest_last_message_id,omitempty"`
+	ReadStateVersion         int      `json:"read_state_version,omitempty"`
+	UserGuildSettingsVersion int      `json:"user_guild_settings_version,omitempty"`
+	UserSettingsVersion      int      `json:"user_settings_version,omitempty"`
+	PrivateChannelsVersion   string   `json:"private_channels_version,omitempty"`
+	APICodeVersion           int      `json:"api_code_version,omitempty"`
 }
 
 func mustMarshalJSON(data interface{}) string {

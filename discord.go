@@ -71,12 +71,12 @@ func New(token string) (s *Session, err error) {
 		s.Identify.Properties = droidIdentifyProperties
 		s.Identify.Capabilities = droidCapabilities
 		s.Identify.ClientState = &ClientState{
-			HighestLastMessageID:     "0",
-			ReadStateVersion:         0,
-			UserGuildSettingsVersion: -1,
-			UserSettingsVersion:      -1,
-			PrivateChannelsVersion:   "0",
-			APICodeVersion:           0,
+			//HighestLastMessageID:     "0",
+			//ReadStateVersion:         0,
+			//UserGuildSettingsVersion: -1,
+			//UserSettingsVersion:      -1,
+			//PrivateChannelsVersion:   "0",
+			//APICodeVersion:           0,
 		}
 		s.Identify.Intents = 0
 
