@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"net/url"
 )
 
 const (
@@ -141,13 +140,33 @@ const (
 	ThreadJoinLocationSidebarOverflow = "Sidebar Overflow"
 )
 
-func (s *Session) ThreadJoinWithLocation(id, location string) error {
-	if !s.IsUser {
-		return s.ThreadJoin(id)
+const (
+	ReactionLocationHoverBar     = "Message Hover Bar"
+	ReactionLocationInlineButton = "Message Inline Button"
+	ReactionLocationPicker       = "Message Reaction Picker"
+	ReactionLocationContextMenu  = "Message Context Menu"
+)
+
+func (s *Session) MessageReactionAddUser(guildID, channelID, messageID, emojiID string, options ...RequestOption) error {
+	if s.IsUser {
+		options = append(
+			options,
+			WithChannelReferer(guildID, channelID),
+			WithLocationParam(ReactionLocationPicker),
+			WithQueryParam("type", "0"),
+		)
 	}
-	endpoint := EndpointThreadMember(id, "@me") + "?" + url.Values{
-		"location": []string{location},
-	}.Encode()
-	_, err := s.RequestWithBucketID("PUT", endpoint, nil, endpoint)
-	return err
+	return s.MessageReactionAdd(channelID, messageID, emojiID, options...)
+}
+
+func (s *Session) MessageReactionRemoveUser(guildID, channelID, messageID, emojiID, userID string, options ...RequestOption) error {
+	if s.IsUser {
+		options = append(
+			options,
+			WithChannelReferer(guildID, channelID),
+			WithLocationParam(ReactionLocationInlineButton),
+			WithQueryParam("burst", "false"),
+		)
+	}
+	return s.MessageReactionRemove(channelID, messageID, emojiID, userID, options...)
 }

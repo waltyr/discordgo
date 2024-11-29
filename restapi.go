@@ -156,6 +156,36 @@ func WithLocale(locale Locale) RequestOption {
 	return WithHeader("X-Discord-Locale", string(locale))
 }
 
+func WithReferer(referer string, args ...any) RequestOption {
+	if len(args) > 0 {
+		referer = fmt.Sprintf(referer, args...)
+	}
+	return WithHeader("Referer", referer)
+}
+
+func WithChannelReferer(guildID, channelID string) RequestOption {
+	if guildID == "" {
+		guildID = "@me"
+	}
+	return WithReferer("https://discord.com/channels/%s/%s", guildID, channelID)
+}
+
+func WithThreadReferer(guildID, channelID, threadID string) RequestOption {
+	return WithReferer("https://discord.com/channels/%s/%s/threads/%s", guildID, channelID, threadID)
+}
+
+func WithQueryParam(key, value string) RequestOption {
+	return func(cfg *RequestConfig) {
+		q := cfg.Request.URL.Query()
+		q.Add(key, value)
+		cfg.Request.URL.RawQuery = q.Encode()
+	}
+}
+
+func WithLocationParam(loc string) RequestOption {
+	return WithQueryParam("location", loc)
+}
+
 // WithContext changes context of the request.
 func WithContext(ctx context.Context) RequestOption {
 	return func(cfg *RequestConfig) {
@@ -1942,9 +1972,9 @@ func (s *Session) ChannelMessageAck(channelID, messageID, lastToken string) (st 
 // ChannelMessageAckNoToken acknowledges and marks the given message as read without a token
 // channeld  : The ID of a Channel
 // messageID : the ID of a Message
-func (s *Session) ChannelMessageAckNoToken(channelID, messageID string) (st *PtrAck, err error) {
+func (s *Session) ChannelMessageAckNoToken(channelID, messageID string, options ...RequestOption) (st *PtrAck, err error) {
 
-	body, err := s.RequestWithBucketID("POST", EndpointChannelMessageAck(channelID, messageID), &PtrAck{}, EndpointChannelMessageAck(channelID, ""))
+	body, err := s.RequestWithBucketID("POST", EndpointChannelMessageAck(channelID, messageID), &PtrAck{}, EndpointChannelMessageAck(channelID, ""), options...)
 	if err != nil {
 		return
 	}
@@ -2038,11 +2068,11 @@ func (s *Session) ChannelMessageSendComplex(channelID string, data *MessageSend,
 	return
 }
 
-func (s *Session) ChannelAttachmentCreate(channelID string, data *ReqPrepareAttachments) (st *RespPrepareAttachments, err error) {
+func (s *Session) ChannelAttachmentCreate(channelID string, data *ReqPrepareAttachments, options ...RequestOption) (st *RespPrepareAttachments, err error) {
 	endpoint := EndpointChannelAttachments(channelID)
 
 	var response []byte
-	response, err = s.RequestWithBucketID("POST", endpoint, data, endpoint)
+	response, err = s.RequestWithBucketID("POST", endpoint, data, endpoint, options...)
 	if err != nil {
 		return
 	}
@@ -3880,7 +3910,7 @@ type respSearchApplicationCommands struct {
 	Cursor              cursor                `json:"cursor"`
 }
 
-func (s *Session) ApplicationCommandsSearch(channelID, query string) (st []*ApplicationCommand, err error) {
+func (s *Session) ApplicationCommandsSearch(channelID, query string, options ...RequestOption) (st []*ApplicationCommand, err error) {
 	queryParams := url.Values{
 		"type":                 {"1"},
 		"query":                {query},
@@ -3895,7 +3925,7 @@ func (s *Session) ApplicationCommandsSearch(channelID, query string) (st []*Appl
 	endpoint := EndpointApplicationCommandsSearch(channelID) + "?" + queryParams.Encode()
 
 	var body []byte
-	body, err = s.RequestWithBucketID("GET", endpoint, nil, endpoint)
+	body, err = s.RequestWithBucketID("GET", endpoint, nil, endpoint, options...)
 	if err != nil {
 		return
 	}
@@ -3936,7 +3966,7 @@ type reqSendInteraction struct {
 	Nonce         string          `json:"nonce"`
 }
 
-func (s *Session) SendInteractions(guildID, channelID string, cmd *ApplicationCommand, options []*ApplicationCommandOptionInput, nonce string) error {
+func (s *Session) SendInteractions(guildID, channelID string, cmd *ApplicationCommand, options []*ApplicationCommandOptionInput, nonce string, reqOptions ...RequestOption) error {
 	if options == nil {
 		options = make([]*ApplicationCommandOptionInput, 0)
 	}
@@ -3964,7 +3994,7 @@ func (s *Session) SendInteractions(guildID, channelID string, cmd *ApplicationCo
 	}
 
 	endpoint := EndpointInteractions
-	_, err := s.request("POST", endpoint, contentType, body, endpoint, 0)
+	_, err := s.request("POST", endpoint, contentType, body, endpoint, 0, reqOptions...)
 	return err
 }
 
