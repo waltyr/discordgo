@@ -202,7 +202,7 @@ var (
 	DroidBaseHeaders = map[string]string{
 		"Sec-Ch-Ua":          fmt.Sprintf(`" Not A;Brand";v="99", "Chromium";v="%[1]s", "Google Chrome";v="%[1]s"`, DroidBrowserMajorVersion),
 		"Sec-Ch-Ua-Mobile":   "?0",
-		"Sec-Ch-Ua-Platform": droidOS,
+		"Sec-Ch-Ua-Platform": `"` + droidOS + `"`,
 
 		"Accept":          "*/*",
 		"Origin":          "https://discord.com",
