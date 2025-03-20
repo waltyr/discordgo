@@ -26,7 +26,7 @@ const (
 
 var (
 	droidCapabilities      = 30717
-	droidClientBuildNumber = 370533
+	droidClientBuildNumber = 380092
 	droidGatewayURL        = ""
 	mainPageLoaded         = false
 )
@@ -34,7 +34,7 @@ var (
 var mainPageLoadLock sync.Mutex
 
 const (
-	DroidBrowserMajorVersion = "133"
+	DroidBrowserMajorVersion = "134"
 	DroidBrowserVersion      = DroidBrowserMajorVersion + ".0.0.0"
 	DroidBrowserUserAgent    = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/" + DroidBrowserVersion + " Safari/537.36"
 )
@@ -98,8 +98,8 @@ func (s *Session) SetGatewayURL(url string) {
 	s.noClearGateway = true
 }
 
-var apiVersionRegex = regexp.MustCompile(`API_VERSION: (\d+),`)
-var gatewayURLRegex = regexp.MustCompile(`GATEWAY_ENDPOINT:\s?['"](.+?)['"],`)
+var apiVersionRegex = regexp.MustCompile(`"?API_VERSION"?:\s?(\d+),`)
+var gatewayURLRegex = regexp.MustCompile(`"?GATEWAY_ENDPOINT"?:\s?['"](.+?)['"],`)
 var mainJSRegex = regexp.MustCompile(`src="(/assets/web.[a-f0-9]{12,32}.js)"`)
 var buildNumberRegex = regexp.MustCompile(`(?:buildNumber|build_number):\s?['"]?(\d{6,})['"]?`)
 
