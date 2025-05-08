@@ -102,12 +102,14 @@ func (s *Session) addEventHandlerOnce(eventHandler EventHandler) func() {
 // to a struct corresponding to the event for which you want to listen.
 //
 // eg:
-//     Session.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
-//     })
+//
+//	Session.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
+//	})
 //
 // or:
-//     Session.AddHandler(func(s *discordgo.Session, m *discordgo.PresenceUpdate) {
-//     })
+//
+//	Session.AddHandler(func(s *discordgo.Session, m *discordgo.PresenceUpdate) {
+//	})
 //
 // List of events can be found at this page, with corresponding names in the
 // library for each event: https://discord.com/developers/docs/topics/gateway#event-names
@@ -193,13 +195,11 @@ func (s *Session) handleEvent(t string, i interface{}) {
 	// All events are dispatched internally first.
 	s.onInterface(i)
 
-	s.EventHandler(i)
-
 	// Then they are dispatched to anyone handling interface{} events.
-	//s.handle(interfaceEventType, i)
+	s.handle(interfaceEventType, i)
 
 	// Finally they are dispatched to any typed handlers.
-	//s.handle(t, i)
+	s.handle(t, i)
 }
 
 // setGuildIds will set the GuildID on all the members of a guild.
